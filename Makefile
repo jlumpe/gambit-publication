@@ -5,11 +5,6 @@ include makefiles/results.mk
 
 SHELL=/bin/bash
 
-# Run a command in the conda environment
-CONDA_RUN=$(CONDA) run -p ./env
-# Executes a Jupyter notebook noninteractively
-RUN_NOTEBOOK=jupyter nbconvert --to notebook --execute --inplace
-
 
 .PHONY: env
 
