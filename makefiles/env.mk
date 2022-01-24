@@ -7,6 +7,11 @@ DEV=
 # Conda command or path to conda executable
 CONDA=conda
 
+# URLs to download GAMBIT database
+GAMBIT_DB_BASE_URL=https://storage.googleapis.com/hesslab-gambit-public/databases/refseq-curated/1.0-beta
+GAMBIT_DB_GENOMES_URL=$(GAMBIT_DB_BASE_URL)/gambit-genomes-1.0b1-210719.db
+GAMBIT_DB_SIGNATURES_URL=$(GAMBIT_DB_BASE_URL)/gambit-signatures-1.0b1-210719.h5
+
 
 # Don't edit variables below:
 
