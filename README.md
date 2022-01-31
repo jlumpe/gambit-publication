@@ -84,7 +84,15 @@ installed.
 
 ### Jupyter notebook kernel
 
-TODO
+The environment created by this project does not include JupyterLab or the notebook viewer.
+Make targets run Jupyter notebooks non-interactively using the `nbconvert` tool. All output
+including plots is saved in the notebook file itself, which you can view by opening the file using
+a Jupyter installation located in another Conda environment.
+
+In order to run notebooks interactively you will have to add an IPython kernel for this repo's
+environment to your Jupyter installation. You can do this by activating the environment and running
+the `install-kernel.py` script in the `setup/` directory. Afterwards you can open the notebooks
+normally and set the kernel to "GAMBIT Publication".
 
 
 ## Download source data
