@@ -99,10 +99,12 @@ normally and set the kernel to "GAMBIT Publication".
 
 Large files in `src-data/` are not present in version control and need to be downloaded separately.
 
-TODO make rules
+Make targets are defined in `makefiles/src-data.mk` to fetch each individual data set. These are run
+automatically when required by other targets, so you shouldn't have to do it manually. If you want
+you can run the `src-data` target to download all source data up front.
 
 
-## Generate results
+## Generating results
 
 TODO
 
