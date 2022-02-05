@@ -6,7 +6,7 @@ performs hierarchical clustering.
 
 ## Input
 
-* `src_data/genome-sets/ecoli-genomes-fig6/`
+* `src_data/genomes/ecoli-genomes-fig6/`
 
 
 ## Output

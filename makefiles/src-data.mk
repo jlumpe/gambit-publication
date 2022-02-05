@@ -5,25 +5,25 @@
   src-data \
   clean-src-data \
   src-data/gambit/database \
-  src-data/genome-sets/ondov-2016/fasta \
+  src-data/genomes/ondov-2016/fasta \
   clean--src-data/gambit/database \
-  clean--src-data/genome-sets/ondov-2016/fasta
+  clean--src-data/genomes/ondov-2016/fasta
 .ONESHELL: \
-  src-data/genome-sets/figure-6/fasta
-#  src-data/genome-sets/ondov-2016/fasta \
+  src-data/genomes/figure-6/fasta
+#  src-data/genomes/ondov-2016/fasta \
 # Don't delete data if the rule fails, probably just want to restart the download
-.PRECIOUS: src-data/genome-sets/ondov-2016/fasta
+.PRECIOUS: src-data/genomes/ondov-2016/fasta
 
 
 # Get all source data
 src-data: \
   src-data/gambit/database \
-  src-data/genome-sets/ondov-2016/fasta
+  src-data/genomes/ondov-2016/fasta
 
 # Remove all source data
 clean-src-data: \
   clean--src-data/gambit/database \
-  clean--src-data/genome-sets/ondov-2016/fasta
+  clean--src-data/genomes/ondov-2016/fasta
 
 
 # GAMBIT database files
@@ -43,20 +43,20 @@ clean--src-data/gambit/database:
 
 
 # Ondov 2016 genomes
-src-data/genome-sets/ondov-2016/fasta: src-data/genome-sets/ondov-2016/fasta/.completed
+src-data/genomes/ondov-2016/fasta: src-data/genomes/ondov-2016/fasta/.completed
 
-src-data/genome-sets/ondov-2016/fasta/.completed:
+src-data/genomes/ondov-2016/fasta/.completed:
 	# Download Ondov 2016 genomes
 	mkdir -p $(dir $@)
-	(cd src-data/genome-sets/ondov-2016; $(CONDA_RUN) python download.py)
+	(cd src-data/genomes/ondov-2016; $(CONDA_RUN) python download.py)
 	touch $@
 
-clean--src-data/genome-sets/ondov-2016/fasta:
-	rm -r src-data/genome-sets/ondov-2016/fasta
+clean--src-data/genomes/ondov-2016/fasta:
+	rm -r src-data/genomes/ondov-2016/fasta
 
 
 # Figure 6 genomes
-src-data/genome-sets/figure-6/fasta:
+src-data/genomes/figure-6/fasta:
 	# Download figure 6 genomes
 	cd $(dir $@)
 	$(call DOWNLOAD_GCS,hesslab-gambit/genomes/210910-ecoli-genomes-for-tree/fasta.tar.gz,kjdkfj)

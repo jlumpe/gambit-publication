@@ -51,7 +51,7 @@ from the project's root directory. This must be done with each new shell session
 * `makefiles/`: Sub-makefiles are in this directory, included from the top-level `Makefile`.
 * `env/`: The conda environment is installed here.
 * `src-data/`: Input data.
-  * `genome-sets/`: Sets of bacterial genomes used for analysis.
+  * `genomes/`: Sets of bacterial genomes used for analysis.
   * `ncbi/`: Data downloaded from NCBI.
 * `results/`: Processed result data.
 * `gambit_pub/`: Python package containing common code for this repo.
