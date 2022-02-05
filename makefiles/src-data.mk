@@ -47,7 +47,7 @@ src-data/genomes/ondov-2016/fasta: src-data/genomes/ondov-2016/fasta/.completed
 src-data/genomes/ondov-2016/fasta/.completed:
 	# Download Ondov 2016 genomes
 	mkdir -p $(dir $@)
-	(cd src-data/genomes/ondov-2016; $(conda_run) python download.py)
+	$(conda_run) python src-data/genomes/ondov-2016/download.py
 	touch $@
 
 clean--src-data/genomes/ondov-2016/fasta:

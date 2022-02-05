@@ -1,8 +1,6 @@
-# Downloads sequences from NCBI FTP server to fata/ directory.
-# Run from this directory, not the repo's root.
+# Downloads genome sequences from NCBI FTP server to fasta/ directory.
 
 import sys
-import os
 from urllib.request import urlretrieve
 from pathlib import Path
 import hashlib
@@ -49,14 +47,15 @@ def download_seq(url, file, md5hash):
 
 	if file_hash != md5hash:
 		messages.append('Download appeared to complete successfully but file hash does not match.')
-		# file.unlink()
+		file.unlink()
 		return False, False, messages
 
 	return True, False, messages
 
 
 if __name__ == '__main__':
-	genomes = pd.read_csv('genomes.csv')
+	thisdir = Path(__file__).parent
+	genomes = pd.read_csv(thisdir / 'genomes.csv')
 	genomes['file'] = list(map(Path, genomes['file']))
 
 	nsuccess = 0
@@ -65,7 +64,7 @@ if __name__ == '__main__':
 
 	with ThreadPoolExecutor(max_workers=8) as executor:
 		future_to_acc = {
-			executor.submit(download_seq, row.url, row.file, row.md5): row.assembly_accession
+			executor.submit(download_seq, row.url, thisdir / row.file, row.md5): row.assembly_accession
 			for idx, row in genomes.iterrows()
 		}
 
