@@ -16,7 +16,7 @@ GAMBIT_DB_SIGNATURES_URL = $(GAMBIT_DB_BASE_URL)/gambit-signatures-1.0b1-210719.
 # Don't edit variables below:
 
 # Run a command in the conda environment
-CONDA_RUN = $(CONDA) run -p ./env
+CONDA_RUN = $(CONDA) run -p $(CURDIR)/env
 # Executes a Jupyter notebook non-interactively
 RUN_NOTEBOOK = jupyter nbconvert --to notebook --execute --inplace
 
