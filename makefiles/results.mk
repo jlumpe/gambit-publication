@@ -7,6 +7,6 @@
 results: results/figure6
 
 
-# Figure 6
 results/figure-6:
-	$(CONDA_RUN) $(RUN_NOTEBOOK) notebooks/figure-6/figure-6.ipynb
+	# Generate figure 6
+	$(conda_run) $(run_notebook) notebooks/figure-6/figure-6.ipynb

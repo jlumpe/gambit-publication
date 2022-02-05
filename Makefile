@@ -21,5 +21,5 @@ list:
 
 # Create the conda environment
 env:
-	$(CONDA) env create -f env.yaml --prefix ./env
-	$(CONDA_RUN) pip $(if $(DEV), "-e") install ./gambit_pub
+	$(conda) env create -f env.yaml --prefix ./env
+	$(conda_run) pip $(if $(devmode), "-e") install ./gambit_pub

@@ -26,13 +26,15 @@ clean-src-data: \
 # GAMBIT database files
 src-data/gambit/database: src-data/gambit/database/db-genomes.db src-data/gambit/database/db-signatures.h5
 
+_gambit_db_base_url := https://storage.googleapis.com/hesslab-gambit-public/databases/refseq-curated/1.0-beta
+
 src-data/gambit/database/db-genomes.db:
 	# Fetch GAMBIT database genomes
-	wget -O $@ $(GAMBIT_DB_GENOMES_URL)
+	wget -O $@ $(_gambit_db_base_url)/gambit-genomes-1.0b1-210719.db
 
 src-data/gambit/database/db-signatures.h5:
 	# Fetch GAMBIT database signatures
-	wget -O $@ $(GAMBIT_DB_SIGNATURES_URL)
+	wget -O $@ $(_gambit_db_base_url)/gambit-signatures-1.0b1-210719.h5
 
 clean--src-data/gambit/database:
 	rm src-data/gambit/database/db-genomes.db
@@ -45,7 +47,7 @@ src-data/genomes/ondov-2016/fasta: src-data/genomes/ondov-2016/fasta/.completed
 src-data/genomes/ondov-2016/fasta/.completed:
 	# Download Ondov 2016 genomes
 	mkdir -p $(dir $@)
-	(cd src-data/genomes/ondov-2016; $(CONDA_RUN) python download.py)
+	(cd src-data/genomes/ondov-2016; $(conda_run) python download.py)
 	touch $@
 
 clean--src-data/genomes/ondov-2016/fasta:
