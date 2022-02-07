@@ -47,7 +47,10 @@ src-data/genomes/ondov-2016/fasta: src-data/genomes/ondov-2016/fasta/.completed
 src-data/genomes/ondov-2016/fasta/.completed:
 	# Download Ondov 2016 genomes
 	mkdir -p $(dir $@)
-	$(conda_run) python src-data/genomes/ondov-2016/download.py
+	$(conda run) python scripts/download-parallel.py \
+		--id=assembly_accession --file=file --md5=md5 \
+		-o src-data/genomes/ondov-2016/fasta \
+		src-data/genomes/ondov-2016/genomes.csv
 	touch $@
 
 clean--src-data/genomes/ondov-2016/fasta:
