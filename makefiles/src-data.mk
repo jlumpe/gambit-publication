@@ -7,7 +7,8 @@
   src-data/gambit/database \
   src-data/genomes/ondov-2016/fasta \
   clean--src-data/gambit/database \
-  clean--src-data/genomes/ondov-2016/fasta
+  clean--src-data/genomes/ondov-2016/fasta \
+  clean--src-data/genomes/figure-6/fasta
 .ONESHELL: \
   src-data/genomes/figure-6/fasta
 
@@ -20,7 +21,8 @@ src-data: \
 # Remove all source data
 clean-src-data: \
   clean--src-data/gambit/database \
-  clean--src-data/genomes/ondov-2016/fasta
+  clean--src-data/genomes/ondov-2016/fasta \
+  clean--src-data/genomes/figure-6/fasta
 
 
 # GAMBIT database files
@@ -61,6 +63,9 @@ clean--src-data/genomes/ondov-2016/fasta:
 src-data/genomes/figure-6/fasta:
 	# Download figure 6 genomes
 	cd $(dir $@)
-	$(call DOWNLOAD_GCS,hesslab-gambit/genomes/210910-ecoli-genomes-for-tree/fasta.tar.gz,kjdkfj)
+	$(call DOWNLOAD_GCS,hesslab-gambit/genomes/210910-ecoli-genomes-for-tree/fasta.tar.gz)
 	tar -xzf fasta.tar.gz
 	rm fasta.tar.gz
+
+clean--src-data/genomes/figure-6/fasta:
+	rm -r $@
