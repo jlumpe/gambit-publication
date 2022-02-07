@@ -39,8 +39,8 @@ src-data/gambit/database/db-signatures.h5:
 	wget -O $@ $(_gambit_db_base_url)/gambit-signatures-1.0b1-210719.h5
 
 clean--src-data/gambit/database:
-	rm src-data/gambit/database/db-genomes.db
-	rm src-data/gambit/database/db-signatures.h5
+	rm -f src-data/gambit/database/db-genomes.db
+	rm -f src-data/gambit/database/db-signatures.h5
 
 
 # Ondov 2016 genomes
@@ -56,7 +56,7 @@ src-data/genomes/ondov-2016/fasta/.completed:
 	touch $@
 
 clean--src-data/genomes/ondov-2016/fasta:
-	rm -r src-data/genomes/ondov-2016/fasta
+	rm -rf src-data/genomes/ondov-2016/fasta
 
 
 # Figure 6 genomes
@@ -65,7 +65,7 @@ src-data/genomes/figure-6/fasta:
 	cd $(dir $@)
 	$(call DOWNLOAD_GCS,hesslab-gambit/genomes/210910-ecoli-genomes-for-tree/fasta.tar.gz)
 	tar -xzf fasta.tar.gz
-	rm fasta.tar.gz
+	rm -f fasta.tar.gz
 
 clean--src-data/genomes/figure-6/fasta:
-	rm -r $@
+	rm -rf $@
