@@ -6,8 +6,10 @@
   clean-src-data \
   src-data/gambit/database \
   src-data/genomes/ondov-2016/fasta \
+  src-data/genomes/konstantinidis-2005/fasta \
   clean--src-data/gambit/database \
   clean--src-data/genomes/ondov-2016/fasta \
+  clean--src-data/genomes/konstantinidis-2005/fasta \
   clean--src-data/genomes/figure-6/fasta
 .ONESHELL: \
   src-data/genomes/figure-6/fasta
@@ -22,6 +24,7 @@ src-data: \
 clean-src-data: \
   clean--src-data/gambit/database \
   clean--src-data/genomes/ondov-2016/fasta \
+  clean--src-data/genomes/konstantinidis-2005/fasta \
   clean--src-data/genomes/figure-6/fasta
 
 
@@ -57,6 +60,22 @@ src-data/genomes/ondov-2016/fasta/.completed:
 
 clean--src-data/genomes/ondov-2016/fasta:
 	rm -rf src-data/genomes/ondov-2016/fasta
+
+
+# Konstantinidis 2005 genomes
+src-data/genomes/konstantinidis-2005/fasta: src-data/genomes/konstantinidis-2005/fasta/.completed
+
+src-data/genomes/konstantinidis-2005/fasta/.completed:
+	# Download Ondov 2016 genomes
+	mkdir -p $(dir $@)
+	$(conda run) python scripts/download-parallel.py \
+		--id=assembly_accession --file=filename --md5=md5 \
+		-o src-data/genomes/konstantinidis-2005/fasta \
+		src-data/genomes/konstantinidis-2005/genomes.csv
+	touch $@
+
+clean--src-data/genomes/konstantinidis-2005/fasta:
+	rm -rf src-data/genomes/konstantinidis-2005/fasta
 
 
 # Figure 6 genomes
