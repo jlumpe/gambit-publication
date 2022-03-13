@@ -12,7 +12,7 @@ dependencies:
   - snakemake
   - numpy
   - Cython
-#  - gambit=0.4.*
+  #  - gambit=0.4.*
   - ipykernel
   - nbconvert
   - scipy
@@ -21,7 +21,7 @@ dependencies:
   - matplotlib
   - seaborn
   - pip:
-    - tqdm
+      - tqdm
 
   # Other tools
   - fastani

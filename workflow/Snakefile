@@ -1,0 +1,18 @@
+from pathlib import Path
+import os
+import pandas as pd
+from snakemake.utils import min_version
+from gambit_pub import wf_utils
+
+min_version("7.0")
+
+
+### Configuration ###
+configfile: "config/config.yaml"
+
+os.environ["GAMBIT_DB_PATH"] = "src-data/gambit/database"
+
+
+### Rules ###
+include: "rules/src-data.smk"
+include: "rules/results.smk"

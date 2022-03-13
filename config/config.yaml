@@ -1,0 +1,7 @@
+
+
+# How to download the GAMBIT database files
+gambit_db:
+  base_url: "https://storage.googleapis.com/hesslab-gambit-public/databases/refseq-curated/1.0-beta"
+  genomes_file: gambit-genomes-1.0b1-210719.db
+  signatures_file: gambit-signatures-1.0b1-210719.h5
