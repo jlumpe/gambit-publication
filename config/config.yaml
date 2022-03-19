@@ -1,3 +1,7 @@
+# The primary k-mer parameters to use for calculating GAMBIT signatures
+kmerparams:
+  k: 11
+  prefix: ATGAC
 
 
 # How to download the GAMBIT database files

@@ -16,6 +16,9 @@ configfile: "config/config.yaml"
 
 os.environ["GAMBIT_DB_PATH"] = "src-data/gambit/database"
 
+K = config['kmerparams']['k']
+PREFIX = config['kmerparams']['prefix']
+
 
 ### Rules ###
 include: "rules/src-data.smk"
