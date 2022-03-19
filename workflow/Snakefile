@@ -14,7 +14,7 @@ wildcard_constraints:
 ### Configuration ###
 configfile: "config/config.yaml"
 
-os.environ["GAMBIT_DB_PATH"] = "src-data/gambit/database"
+os.environ["GAMBIT_DB_PATH"] = "resources/gambit/database"
 
 K = config['kmerparams']['k']
 PREFIX = config['kmerparams']['prefix']

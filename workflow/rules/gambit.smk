@@ -3,7 +3,7 @@
 # Generate signatures for genomes in each genome set
 rule genome_set_signatures:
 	input:
-		"src-data/genomes/{genomeset}/fasta",
+		"resources/genomes/{genomeset}/fasta",
 	output:
 		"intermediate-data/genomes/{genomeset}/signatures/{k}-{prefix}.h5",
 	shell:
