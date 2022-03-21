@@ -19,6 +19,6 @@ gambit_db:
 
 # Parameters tailored to specific genome sets
 genome_sets:
-  ondov-2016:
+  ondov_2016:
     # This one has way more genomes than the others, divide FastANI queries into chunks
     fastani_chunk_size: 10

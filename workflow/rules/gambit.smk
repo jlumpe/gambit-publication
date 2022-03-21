@@ -1,11 +1,12 @@
+"""Run GAMBIT CLI tool."""
 
 
 # Generate signatures for genomes in each genome set
-rule genome_set_signatures:
+rule gambit_signatures:
 	input:
 		"resources/genomes/{genomeset}/fasta",
 	output:
-		"intermediate-data/genomes/{genomeset}/signatures/{k}-{prefix}.h5",
+		"intermediate-data/signatures/{genomeset}-{k}-{prefix}.h5",
 	shell:
 		"""
 		genomes_dir=$(dirname {input[0]})
@@ -18,11 +19,11 @@ rule genome_set_signatures:
 		"""
 
 
-# Calculate pairwise distances from genome set signatures
-rule genome_set_pw_dists:
+# Pairwise GAMBIT distances from genome set signatures
+rule gambit_pw_dists:
 	input:
-		lambda wildcards: expand(rules.genome_set_signatures.output[0], **wildcards),
+		rules.gambit_signatures.output
 	output:
-		"intermediate-data/genomes/{genomeset}/pw-dists/{k}-{prefix}.csv",
+		"intermediate-data/gambit-pw-dists/{genomeset}-{k}-{prefix}.csv",
 	shell:
 	    "gambit dist -s --qs {input[0]} -o {output[0]}"

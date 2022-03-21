@@ -1,9 +1,9 @@
 # Generate figure 6
 rule figure_6:
 	input:
-		genomes_csv="resources/genomes/figure-6/genomes.csv",
-		pw_dists=expand(rules.genome_set_pw_dists.output[0], genomeset='figure-6', k=K, prefix=PREFIX)[0],
+		genomes_csv="resources/genomes/figure_6/genomes.csv",
+		pw_dists=expand(rules.gambit_pw_dists.output[0], genomeset='figure_6', k=K, prefix=PREFIX)[0],
 	output:
-		"results/figure-6.png"
+		"results/figure-6/figure-6.png"
 	script:
 	    "../scripts/figure-6.py"

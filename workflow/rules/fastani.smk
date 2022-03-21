@@ -7,26 +7,31 @@ genome_sets.{genomeset}.fastani_chunk_size config variable, if present.
 """
 
 
-def fastani_input(wildcards):
+FASTANI_CHUNKS_DIR = "intermediate-data/fastani/chunks/{genomeset}"
+
+
+def get_fastani_input(wildcards):
 	"""Get input files for the fastani rule (output chunks to combine).
 
 	This depends on the output of the fastani_chunks checkpoint.
 	"""
-	chunkdir = Path(checkpoints.fastani_chunks.get(genomeset=wildcards.genomeset).output[0])
+	chunkdir = Path(checkpoints.fastani_query_chunks.get(genomeset=wildcards.genomeset).output[0])
 	chunks = [f.stem for f in chunkdir.glob('*-*.txt')]
 	return expand(rules.fastani_chunk.output[0], genomeset=wildcards.genomeset, chunk=chunks)
 
 
-# Divide query genome list into chunks so that FastANI run time for each is reasonable.
-checkpoint fastani_chunks:
+# Divide query genome list into chunks so that the FastANI run time for each is reasonable.
+checkpoint fastani_query_chunks:
+	input:
+		list_file="resources/genomes/{genomeset}/genomes.txt",
 	output:
-	      directory("intermediate-data/genomes/{genomeset}/fastani/chunks")
+	      directory(f"{FASTANI_CHUNKS_DIR}/queries")
 	run:
 		out_dir = Path(output[0])
 		out_dir.mkdir()
 
 		# Ready query list file
-		with open(f'resources/genomes/{wildcards.genomeset}/genomes.txt') as f:
+		with open(input['list_file']) as f:
 			lines = list(f)
 
 		# Get chunk size from config (if present), default to single chunk
@@ -46,9 +51,10 @@ checkpoint fastani_chunks:
 # genomes for queries.
 rule fastani_chunk:
 	input:
-		"resources/genomes/{genomeset}/fasta"
+		fasta="resources/genomes/{genomeset}/fasta",
+		query_chunks=rules.fastani_query_chunks.output[0],
 	output:
-		temporary("intermediate-data/genomes/{genomeset}/fastani/fastani-{chunk}.tsv")
+		temporary(f"{FASTANI_CHUNKS_DIR}/{{chunk}}.tsv")
 	wildcard_constraints:
 		chunk="\d+-\d+"
 	params:
@@ -58,8 +64,8 @@ rule fastani_chunk:
 	shell:
 	     """
 		 output="$(realpath {output})"
-		 queries="$(realpath intermediate-data/genomes/{wildcards.genomeset}/fastani/chunks/{wildcards.chunk}.txt)"
-		 cd {input}
+		 queries="$(realpath {input[query_chunks]}/{wildcards.chunk}.txt)"
+		 cd {input[fasta]}
 		 fastANI -k {params.k} --fragLen {params.fraglen} -t {threads} \\
 			 --ql "$queries" --rl ../genomes.txt -o "$output"
 		 """
@@ -68,9 +74,9 @@ rule fastani_chunk:
 # Get complete result file. This is the only rule whose output is needed in other files.
 rule fastani:
 	input:
-	     fastani_input
+	     get_fastani_input
 	output:
-	      "intermediate-data/genomes/{genomeset}/fastani/fastani.tsv"
+	      "intermediate-data/fastani/{genomeset}.tsv"
 	shell:
 	     # Concatenate all chunks into a single output file
 	     "cat {input} > {output}"
