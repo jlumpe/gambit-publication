@@ -4,8 +4,21 @@ kmerparams:
   prefix: ATGAC
 
 
+# Parameters for FastANI
+fastani:
+  k: 16  # Default
+  fraglen: 3000  # Default
+
+
 # How to download the GAMBIT database files
 gambit_db:
   base_url: "https://storage.googleapis.com/hesslab-gambit-public/databases/refseq-curated/1.0-beta"
   genomes_file: gambit-genomes-1.0b1-210719.db
   signatures_file: gambit-signatures-1.0b1-210719.h5
+
+
+# Parameters tailored to specific genome sets
+genome_sets:
+  ondov-2016:
+    # This one has way more genomes than the others, divide FastANI queries into chunks
+    fastani_chunk_size: 10
