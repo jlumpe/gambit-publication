@@ -46,3 +46,12 @@ rule get_genomes_fig6:
 			untar=True,
 			gz=True,
 		)
+
+
+# Download all source data
+rule get_src_data:
+	input:
+	     rules.get_gambit_db.output,
+	     rules.get_genomes_konstantinidis2005.output,
+	     rules.get_genomes_ondov2016.output,
+	     rules.get_genomes_fig6.output,
