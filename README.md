@@ -3,108 +3,61 @@
 Code to reproduce figures and data in {publication name}.
 
 
-## Overview
+## Instructions
 
-This project is based around [GNU Make](https://www.gnu.org/software/make/). Make targets are defined
-for all actions such as setting up the environment, downloading source data, and producing specific
-figures and results. Rules can be built by running `make NAME_OF_RULE`.
-Make keeps track of the dependencies of all targets, so for example building the `results/figure-6`
-target will automatically build (TODO - name) to download the required source data if it has not
-been done already.
+This project is implemented as a [Snakemake](https://snakemake.github.io/) workflow. After
+installing and activating the conda environment (see the [Setup](#setup) section below), simply run:
 
-To generate all figures and results in the project you just need to build the `results` target by
-running `make results`.
+```
+snakemake [TARGETS...]
+```
 
+from the project's root directory.
 
-### Make targets
+By default the `all` target is run, which creates all figures and results. You can also run the
+following targets individually:
 
-The important targets are:
-
-* `env`: Creates the conda environment containing all software dependencies.
-* TODO: download source data
-* `results`: Generate all results and figures.
-
-Targets are explained in more detail in the following sections.
+* `figure_1` through `figure_6`: Generate individual figures.
 
 
-### Jupyter notebooks
+## Directory structure
 
-All analyses are run in Jupyter notebooks in the `notebooks/` directory. All make targets will
-execute the required notebooks non-interactively.
-
-To run the notebooks interactively, ... TODO
-
-
-### Conda environment
-
-All software dependencies, with the exception of those listed in [Prerequisites](#prerequisites),
-are installed into a conda environment in the `env/` subdirectory. All make rules use this
-environment automatically where necessary, so activating it manually is not required.
-
-To use the environment in your shell for testing/debugging purposes first run `conda activate ./env`
-from the project's root directory. This must be done with each new shell session.
-
-
-### Directory structure
-
-* `notebooks/`: Jupyter notebooks go here.
-* `makefiles/`: Sub-makefiles are in this directory, included from the top-level `Makefile`.
-* `env/`: The conda environment is installed here.
-* `src-data/`: Input data.
+* `workflow/`: Snakemake workflow files as well as related Python scripts and Jupyter notebooks.
+* `config/`: Workflow configuration files.
+* `resources/`: Input data.
   * `genomes/`: Sets of bacterial genomes used for analysis.
-  * `ncbi/`: Data downloaded from NCBI.
+  * `gambit-db/`: GAMBIT database files.
+* `intermediate-data/`: Output of intermediate workflow targets.
 * `results/`: Processed result data.
 * `gambit_pub/`: Python package containing common code for this repo.
-* `setup/`: Tools to set up the project.
+* `env/`: The conda environment can be installed here.
 
 
 ## Setup
 
-### Prerequisites
+### Required software
 
-The following software needs to be installed:
-
-* [GNU Make](https://www.gnu.org/software/make/) - this should already be present in most Linux
-  distributions.
-* The [conda](https://docs.conda.io) package manager. Recommend to download the Miniconda installer
-  [here](https://docs.conda.io/en/latest/miniconda.html).
+All software dependencies are installed using the [conda](https://docs.conda.io) package manager.
+If you do not already have it installed, I recommend using the Miniconda installer available
+[here](https://docs.conda.io/en/latest/miniconda.html). Make sure the `conda` command is available
+in your shell.
 
 
-### Configuration
+### Conda environment
 
-The `makefiles/env.mk` file contains environment variable definitions that can be customized. You
-can edit the file directly or use the `make VAR=VALUE ...` syntax.
+Install the conda environment into the `env/` subdirectory with:
 
+```
+conda env create -f env.yaml -p env
+```
 
-### Create the conda environment
-
-The `env` rule creates a conda environment in the `env/` directory with all required software
-installed.
-
-
-### Jupyter notebook kernel
-
-The environment created by this project does not include JupyterLab or the notebook viewer.
-Make targets run Jupyter notebooks non-interactively using the `nbconvert` tool. All output
-including plots is saved in the notebook file itself, which you can view by opening the file using
-a Jupyter installation located in another Conda environment.
-
-In order to run notebooks interactively you will have to add an IPython kernel for this repo's
-environment to your Jupyter installation. You can do this by activating the environment and running
-`scripts/install-kernel.py`. Afterwards you can open the notebooks normally and set the kernel to
-"GAMBIT Publication".
+Before running the workflow you must activate the environment by running `conda activate ./env`
+from the project's root directory. This must be done with each new shell session.
 
 
-## Download source data
+### Download source data
 
-Large files in `src-data/` are not present in version control and need to be downloaded separately.
-
-Make targets are defined in `makefiles/src-data.mk` to fetch each individual data set. These are run
-automatically when required by other targets, so you shouldn't have to do it manually. If you want
-you can run the `src-data` target to download all source data up front.
-
-
-## Generating results
-
-TODO
+Large files in `resources/` are not present in version control and need to be downloaded separately.
+You can do this all up front by running the `get_src_data` target. Otherwise the individual data
+sets will be downloaded as needed when running the workflow.
 
