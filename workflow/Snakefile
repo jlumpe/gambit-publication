@@ -26,3 +26,8 @@ include: "rules/src-data.smk"
 include: "rules/fastani.smk"
 include: "rules/gambit.smk"
 include: "rules/results.smk"
+
+
+rule all:
+	input:
+		*rules.figure_6.output,
