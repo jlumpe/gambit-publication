@@ -23,6 +23,6 @@ PREFIX = config['kmerparams']['prefix']
 
 ### Rules ###
 include: "rules/src-data.smk"
-include: "rules/gambit.smk"
 include: "rules/fastani.smk"
+include: "rules/gambit.smk"
 include: "rules/results.smk"

@@ -27,3 +27,13 @@ rule gambit_pw_dists:
 		"intermediate-data/gambit-pw-dists/{genomeset}-{k}-{prefix}.csv",
 	shell:
 	    "gambit dist -s --qs {input[0]} -o {output[0]}"
+
+
+rule gambit_vs_ani:
+	input:
+		gambit=rules.gambit_pw_dists.output[0],
+		fastani=rules.fastani.output[0],
+	output:
+		"intermediate-data/gambit-vs-ani/{genomeset}-{k}-{prefix}.csv",
+	script:
+		"../scripts/gambit-vs-ani.py"
