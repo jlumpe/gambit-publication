@@ -1,4 +1,12 @@
-from pathlib import Path
+"""Generate figure 6.
+
+Expected Snakemake variables:
+
+* input
+    * genomes_csv: CSV file of genome attributes.
+    * pw_dists: CSV file of pairwise GAMBIT distances.
+* output: Figure PNG
+"""
 
 import numpy as np
 import pandas as pd
@@ -100,15 +108,12 @@ for side in ['left', 'top', 'right']:
 
 lo = dg['leaf_order']
 hm = hm_ax.pcolor(dmat[np.ix_(lo, lo)], cmap='Purples_r')
-# sns.heatmap(dmat[np.ix_(lo, lo)], ax=hm_ax, cmap='Purples_r', cbar=False)
 hm_ax.axis('off')
 hm_ax.set_aspect(1, share=False, adjustable='box', anchor='W')
-# hm_ax.axis('image')
 
 
 ### Table ###
 
-# tbl_ax.axis('off')
 for spine in tbl_ax.spines.values():
     spine.set_visible(False)
 
