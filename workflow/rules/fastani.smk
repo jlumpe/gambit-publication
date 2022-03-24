@@ -1,7 +1,7 @@
 """
 Compute all pairwise FastANI comparisons for a given genome set.
 
-The Ondov-2016 set is much larger than the others, and so needs to be divided up into several chunks
+Genome set 1 is much larger than the others, and so needs to be divided up into several chunks
 to make things reasonable. The size of each chunk (number of query genomes) is determined by the
 genome_sets.{genomeset}.fastani_chunk_size config variable, if present.
 """

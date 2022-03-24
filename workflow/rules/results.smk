@@ -1,5 +1,5 @@
 # Main 3 genome sets that are used for figures 1 and 2
-COMPARISON_GENOME_SETS = ['ondov_2016', 'konstantinidis_2005']
+COMPARISON_GENOME_SETS = ['set1', 'set2', 'set3']
 
 
 ### Figure 1 ###

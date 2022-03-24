@@ -2,48 +2,11 @@
 
 import os
 from pathlib import Path
-from urllib.request import Request, urlopen, urlretrieve
-import shutil
-from tarfile import TarFile
-from gzip import GzipFile
+from urllib.request import urlretrieve
 import hashlib
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from tqdm import tqdm
-
-
-def download_gcs(file: str, dest: str, untar: bool = False, gz: bool = False):
-	"""Download private GCS file.
-
-	Requires the environment variable GCS_OAUTH2_TOKEN to be set.
-
-	Parameters
-	----------
-	file
-		GCS file to download, {bucket}/{path}
-	dest
-		Destination file path.
-	untar
-		Use tar to extract the file with ``dest`` as the destination directory.
-	gz
-		If the file is gzipped an should be uncompressed.
-	"""
-	auth = os.environ.get('GCS_OAUTH2_TOKEN')
-	if not auth:
-		raise RuntimeError('Environment variable GCS_OAUTH2_TOKEN must be set to download private GCS files.')
-
-	req = Request(f'https://storage.googleapis.com/{file}')
-	req.add_header('Authorization', f'Bearer {auth}')
-	fsrc = urlopen(req)
-	if gz:
-		fsrc = GzipFile(fileobj=fsrc)
-
-	if untar:
-		tf = TarFile(fileobj=fsrc)
-		tf.extractall(dest)
-	else:
-		with open(dest, 'wb') as fdst:
-			shutil.copyfileobj(fsrc, fdst)
 
 
 def get_md5(file):

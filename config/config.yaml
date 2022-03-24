@@ -10,11 +10,17 @@ fastani:
   fraglen: 3000  # Default
 
 
-# How to download the GAMBIT database files
-gambit_db:
-  base_url: "https://storage.googleapis.com/hesslab-gambit-public/databases/refseq-curated/1.0-beta"
-  genomes_file: gambit-genomes-1.0b1-210719.db
-  signatures_file: gambit-signatures-1.0b1-210719.h5
+# URLs for downloading source files
+src_data:
+  gambit_db:
+    genomes: "hesslab-gambit-public/databases/refseq-curated/1.0-beta/gambit-genomes-1.0b1-210719.db"
+    signatures: "hesslab-gambit-public/databases/refseq-curated/1.0-beta/gambit-signatures-1.0b1-210719.h5"
+  genome_sets:
+    set3:
+      fasta: "hesslab-gambit-public/genomes/set3/fasta/"
+      fastq: "hesslab-gambit-public/genomes/set3/fastq/"
+    figure_6:
+      tarball: "hesslab-gambit-public/genomes/figure-6/fasta.tar.gz"
 
 
 # Parameter space for figure 2
@@ -35,6 +41,6 @@ fig2_params:
 
 # Parameters tailored to specific genome sets
 genome_sets:
-  ondov_2016:
+  set1:
     # This one has way more genomes than the others, divide FastANI queries into chunks
     fastani_chunk_size: 10

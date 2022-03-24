@@ -27,6 +27,8 @@ dflt_pver = 0
 dflt_prefix = prefix_map[(dflt_plen, dflt_pver)]
 baselines = df.xs((dflt_k, dflt_plen, dflt_pver), level=('k', 'prefix_len', 'prefix_version'))['spearman'].to_dict()
 
+gset_labels = ['Set 1', 'Set 2', 'Set 3']
+
 
 ### Set up figure and shared axes ###
 
@@ -81,7 +83,7 @@ for spine in axes[prefix_lens.get_loc(dflt_plen), dflt_pver].spines.values():
 
 fig.tight_layout(h_pad=0, w_pad=1, rect=(.015, .02, 1, 1))
 
-fig.legend(axes[0, 0].lines, genome_sets, loc='lower right', ncol=len(genome_sets), fontsize=12)
+fig.legend(axes[0, 0].lines, gset_labels, loc='lower right', ncol=len(genome_sets), fontsize=12)
 
 
 ### Save ###

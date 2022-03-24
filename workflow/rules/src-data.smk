@@ -1,4 +1,8 @@
-# Download source data
+"""Download source data."""
+
+
+# Prefix for GCS URLs
+GCS_PREFIX = 'https://storage.googleapis.com/'
 
 
 # Download GAMBIT database files
@@ -6,52 +10,93 @@ rule get_gambit_db:
 	output:
 		genomes='resources/gambit-db/db-genomes.db',
 		signatures='resources/gambit-db/db-signatures.h5',
+	params:
+		genomes_url=GCS_PREFIX + config['src_data']['gambit_db']['genomes'],
+		signatures_url=GCS_PREFIX + config['src_data']['gambit_db']['signatures'],
 	shell:
 	    '''
-		wget -O {output.genomes} {config[gambit_db][base_url]}/{config[gambit_db][genomes_file]}
-		wget -O {output.signatures} {config[gambit_db][base_url]}/{config[gambit_db][signatures_file]}
+		curl -f -o {output.genomes} {params[genomes_url]}
+		curl -f -o {output.signatures} {params[signatures_url]}
 		'''
 
 
-# Download ondov-2016 genomes
-rule get_genomes_ondov2016:
+# Download genome set 1 or 2
+rule get_genome_set_12:
 	output:
-		directory('resources/genomes/ondov_2016/fasta'),
+		directory("resources/genomes/{genomeset}/fasta/"),
+	wildcard_constraints:
+		genomeset="set[12]",
 	run:
-		os.mkdir(output[0])
-		table = pd.read_csv('resources/genomes/ondov_2016/genomes.csv')
+		outdir = Path(output[0])
+		dl_dir = outdir.parent / '.fasta-download'
+		dl_dir.mkdir(exist_ok=True)
+
+		table = pd.read_csv(outdir.parent / 'genomes.csv')
 		items = [(row.url, row.assembly_accession + '.fa.gz', row.md5) for _, row in table.iterrows()]
-		wf_utils.download_parallel(items, output[0])
+		wf_utils.download_parallel(items, dl_dir)
+
+		outdir.symlink_to(dl_dir.name, True)
 
 
-# Download konstantinidis-2005 genomes
-rule get_genomes_konstantinidis2005:
+# Download genome set 3
+rule get_genome_set_3:
 	output:
-		directory('resources/genomes/konstantinidis_2005/fasta'),
+		directory("resources/genomes/set3/fasta/")
 	run:
-		os.mkdir(output[0])
-		table = pd.read_csv('resources/genomes/konstantinidis_2005/genomes.csv')
-		items = [(row.url, row.assembly_accession + '.fa.gz', row.md5) for _, row in table.iterrows()]
-		wf_utils.download_parallel(items, output[0])
+		gs_dir = config['src_data']['genome_sets']['set3']['fasta'].rstrip('/')
+		prefix = GCS_PREFIX + gs_dir + '/'
+
+		outdir = Path(output[0])
+		dl_dir = outdir.parent / '.fasta-download'
+		dl_dir.mkdir(exist_ok=True)
+
+		items = []
+		with open('resources/genomes/set3/genomes.txt') as f:
+			for line in f:
+				fname = line.strip()
+				items.append((prefix + fname, fname, None))
+
+		wf_utils.download_parallel(items, dl_dir)
+		outdir.symlink_to(dl_dir.name, True)
+
+
+# Download fastq files for genome set 3
+rule get_genome_set_3_fastq:
+	output:
+	      directory("resources/genomes/set3/fastq/")
+	run:
+		gs_dir = config['src_data']['genome_sets']['set3']['fastq'].rstrip('/')
+		prefix = GCS_PREFIX + gs_dir + '/'
+
+		outdir = Path(output[0])
+		dl_dir = outdir.parent / '.fasta-download'
+		dl_dir.mkdir(exist_ok=True)
+
+		items = []
+		with open('resources/genomes/set3/genomes.txt') as f:
+			for line in f:
+				fname = line.strip().rsplit('.', 1)[0] + '.fasta.gz'
+				items.append((prefix + fname, fname, None))
+
+		wf_utils.download_parallel(items, dl_dir)
+		outdir.symlink_to(dl_dir.name, True)
 
 
 # Download genomes for figure 6
 rule get_genomes_fig6:
 	output:
 	    directory('resources/genomes/figure_6/fasta'),
-	run:
-		wf_utils.download_gcs(
-			'hesslab-gambit/genomes/210910-ecoli-genomes-for-tree/fasta.tar.gz',
-			Path(output[0]).parent,
-			untar=True,
-			gz=True,
-		)
+	params:
+		url=GCS_PREFIX + config['src_data']['genome_sets']['figure_6']['tarball'],
+	shell:
+		"""
+		parent=$(dirname {output})
+		curl {params[url]} | tar -xzf - -C $parent
+		"""
 
 
 # Download all source data
 rule get_src_data:
 	input:
-	     rules.get_gambit_db.output,
-	     rules.get_genomes_konstantinidis2005.output,
-	     rules.get_genomes_ondov2016.output,
-	     rules.get_genomes_fig6.output,
+	     *expand('resources/genomes/{gset}/fasta', gset=['set1', 'set2', 'set3', 'figure_6']),
+	     rules.get_genome_set_3_fastq.output,

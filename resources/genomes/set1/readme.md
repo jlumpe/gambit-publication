@@ -1,4 +1,4 @@
-# Ondov 2016 Escherichia Genomes
+# Genome set 1
 
 Set of 492 Escherichia genomes used in the Mash paper (Ondov 2016). This is used as a
 medium-diversity data set for evaluating the GAMBIT distance metric.

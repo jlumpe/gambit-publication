@@ -1,4 +1,4 @@
-# Konstantinidis 2005 Genomes
+# Genome set 2
 
 Set of 70 genomes derived from Supporting Table 1 in (Konstantinidis 2016). This is used as a
 high-diversity data set for evaluating the GAMBIT distance metric as it spans multiple bacterial
