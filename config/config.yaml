@@ -17,6 +17,22 @@ gambit_db:
   signatures_file: gambit-signatures-1.0b1-210719.h5
 
 
+# Parameter space for figure 2
+fig2_params:
+  k: [7, 9, 11, 13, 15]
+  prefix_len: [4, 5, 6, 7]
+  # First is our standard ATGAC plus two random nucleotides, remaining seven are randomly generated
+  base_prefix:
+    - ATGACTG
+    - ATCATTT
+    - TCTCGAT
+    - GAAAGCG
+    - TTGACCC
+    - CACATAT
+    - CGTTAGT
+    - ACTCTTG
+
+
 # Parameters tailored to specific genome sets
 genome_sets:
   ondov_2016:

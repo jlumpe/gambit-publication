@@ -31,4 +31,5 @@ include: "rules/results.smk"
 rule all:
 	input:
 		*rules.figure_1.output,
+		*rules.figure_2.output,
 		*rules.figure_6.output,
