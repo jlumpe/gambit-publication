@@ -1,0 +1,16 @@
+# Override parameters in main config file for testing
+# Use this by adding
+#   --config test=true
+# to the command line options.
+
+figure_2:
+  k: [9, 11, 13]
+  prefix_len: [5, 6]
+  base_prefix:
+    - ATGACTG
+    - ATCATTT
+    - TCTCGAT
+
+genome_sets:
+  set1:
+    fastani_chunk_size: null

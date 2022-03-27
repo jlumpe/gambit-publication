@@ -1,3 +1,7 @@
+# If we're running in test mode. Override this from the command line.
+test: false
+
+
 # Standard parameters for GAMBIT command line
 gambit:
   k: 11

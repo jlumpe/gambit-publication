@@ -61,3 +61,8 @@ Large files in `resources/` are not present in version control and need to be do
 You can do this all up front by running the `get_src_data` target. Otherwise the individual data
 sets will be downloaded as needed when running the workflow.
 
+
+## Development
+
+You can enable "test mode" by adding `--config test=true` to the command line options. This loads
+an alternate set of parameters which greatly reduces the amount of work to be done.
