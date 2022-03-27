@@ -38,3 +38,10 @@ rule all:
 		*rules.figure_1.output,
 		*rules.figure_2.output,
 		*rules.figure_6.output,
+
+
+# Starts IPython shell with access to global scope of workflow. For testing/development.
+rule debug:
+	run:
+		import IPython
+		IPython.embed()
