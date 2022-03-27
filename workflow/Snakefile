@@ -20,12 +20,17 @@ os.environ["GAMBIT_DB_PATH"] = "resources/gambit-db"
 K = config['kmerparams']['k']
 PREFIX = config['kmerparams']['prefix']
 
+# Main genome sets compared in figures 1 and 2
+COMPARISON_GENOME_SETS = ['set1', 'set2', 'set3']
+
 
 ### Rules ###
 include: "rules/src-data.smk"
 include: "rules/fastani.smk"
 include: "rules/gambit.smk"
-include: "rules/results.smk"
+include: "rules/figure-1.smk"
+include: "rules/figure-2.smk"
+include: "rules/figure-6.smk"
 
 
 rule all:
