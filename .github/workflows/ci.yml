@@ -1,0 +1,55 @@
+
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+    defaults:
+      run:
+        # Need to run login shell to have conda environment initialized
+        shell: bash -l {0}
+
+    steps:
+    - uses: actions/checkout@v2
+
+    # The next 4 steps are taken from:
+    # https://github.com/marketplace/actions/setup-miniconda#caching-environments
+
+    - name: Setup Mambaforge
+      uses: conda-incubator/setup-miniconda@v2
+      with:
+        miniforge-variant: Mambaforge
+        miniforge-version: latest
+        activate-environment: gambit-pub
+        use-mamba: true
+
+    # Get current date to use as part of cache key in next step
+    - name: Get Date
+      id: get-date
+      run: echo "::set-output name=today::$(/bin/date -u '+%Y%m%d')"
+      shell: bash
+
+    - name: Cache Conda env
+      id: cache-env
+      uses: actions/cache@v2
+      with:
+        path: ${{ env.CONDA }}/envs
+        key: conda-${{ runner.os }}--${{ runner.arch }}--${{ steps.get-date.outputs.today }}-${{ hashFiles('env.yaml') }}-${{ env.CACHE_NUMBER }}
+      env:
+        # Increase this value to reset cache if etc/example-environment.yml has not changed
+        CACHE_NUMBER: 0
+
+    - name: Update Conda environment
+      run: mamba env update -n gambit-pub -f env.yaml
+      if: steps.cache-env.outputs.cache-hit != 'true'
+
+    - name: Test workflow
+      run: |
+        snakemake -l
