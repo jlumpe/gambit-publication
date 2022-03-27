@@ -17,8 +17,8 @@ configfile: "config/config.yaml"
 
 os.environ["GAMBIT_DB_PATH"] = "resources/gambit-db"
 
-K = config['kmerparams']['k']
-PREFIX = config['kmerparams']['prefix']
+K = config['gambit']['k']
+PREFIX = config['gambit']['prefix']
 
 # Main genome sets compared in figures 1 and 2
 COMPARISON_GENOME_SETS = ['set1', 'set2', 'set3']

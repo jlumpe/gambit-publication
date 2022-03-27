@@ -1,7 +1,7 @@
 def get_fig2_params():
 	"""Data frame of all combinations of parameter values for figure 2."""
 
-	values = config['fig2_params']
+	values = config['figure_2']
 	index = pd.MultiIndex.from_product(
 		[COMPARISON_GENOME_SETS, values['k'], values['prefix_len'], range(len(values['base_prefix']))],
 		names=['genomeset', 'k', 'prefix_len', 'prefix_version'],
