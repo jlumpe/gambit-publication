@@ -1,5 +1,13 @@
-"""Download source data."""
+"""Download source data.
 
+For rules that download multiple genomes one at a time, the files are placed in a separate directory
+and then a symlink to that directory is created as the rule's output.
+That way when some but not all downloads fail Snakemake will delete the symlink instead of the
+directory containing the successful downloads.
+The rule can then be rerun and it will not attempt to re-download the genomes already present.
+"""
+
+GENOMES_DL_DIR = 'resources/genomes/.download/'
 
 # Prefix for GCS URLs
 GCS_PREFIX = 'https://storage.googleapis.com/'
@@ -20,72 +28,74 @@ rule get_gambit_db:
 		'''
 
 
-# Download genome set 1 or 2
+def download_and_link(items, dl_path, link_path):
+	"""Download list of files to a directory and create a symlink to that directory."""
+
+	from gambit_pub.download import download_parallel
+	from gambit_pub.utils import symlink_to_relative
+
+	dl_path = Path(dl_path)
+	dl_path.mkdir(parents=True, exist_ok=True)
+	download_parallel(items, dl_path)
+	symlink_to_relative(dl_path, link_path)
+
+
+# Download genome set 1 or 2 (both from NCBI FTP server)
 rule get_genome_set_12:
+	input:
+		'resources/genomes/{genomeset}/genomes.csv'
 	output:
-		directory("resources/genomes/{genomeset}/fasta/"),
+		directory('resources/genomes/{genomeset}/fasta/')
+	params:
+		dl_dir=GENOMES_DL_DIR + '{genomeset}/fasta/',
 	wildcard_constraints:
 		genomeset="set[12]",
 	run:
-		from gambit_pub.download import download_parallel
-
-		outdir = Path(output[0])
-		dl_dir = outdir.parent / '.fasta-download'
-		dl_dir.mkdir(exist_ok=True)
-
-		table = pd.read_csv(outdir.parent / 'genomes.csv')
+		table = pd.read_csv(input[0])
 		items = [(row.url, row.assembly_accession + '.fa.gz', row.md5) for _, row in table.iterrows()]
-		download_parallel(items, dl_dir)
-
-		outdir.symlink_to(dl_dir.name, True)
+		download_and_link(items, params['dl_dir'], output[0])
 
 
 # Download genome set 3
 rule get_genome_set_3:
+	input:
+	     'resources/genomes/set3/genomes.txt'
 	output:
-		directory("resources/genomes/set3/fasta/")
+		directory('resources/genomes/set3/fasta/')
+	params:
+	      dl_dir=GENOMES_DL_DIR + 'set3/fasta/',
 	run:
-		from gambit_pub.download import download_parallel
-
 		gs_dir = config['src_data']['genome_sets']['set3']['fasta'].rstrip('/')
 		prefix = GCS_PREFIX + gs_dir + '/'
 
-		outdir = Path(output[0])
-		dl_dir = outdir.parent / '.fasta-download'
-		dl_dir.mkdir(exist_ok=True)
-
 		items = []
-		with open('resources/genomes/set3/genomes.txt') as f:
+		with open(input[0]) as f:
 			for line in f:
 				fname = line.strip()
 				items.append((prefix + fname, fname, None))
 
-		download_parallel(items, dl_dir)
-		outdir.symlink_to(dl_dir.name, True)
+		download_and_link(items, params['dl_dir'], output[0])
 
 
 # Download fastq files for genome set 3
 rule get_genome_set_3_fastq:
+	input:
+	     'resources/genomes/set3/genomes.txt'
 	output:
-	      directory("resources/genomes/set3/fastq/")
+	      directory('resources/genomes/set3/fastq/')
+	params:
+	      dl_dir=GENOMES_DL_DIR + 'set3/fastq/',
 	run:
-		from gambit_pub.download import download_parallel
-
 		gs_dir = config['src_data']['genome_sets']['set3']['fastq'].rstrip('/')
 		prefix = GCS_PREFIX + gs_dir + '/'
 
-		outdir = Path(output[0])
-		dl_dir = outdir.parent / '.fasta-download'
-		dl_dir.mkdir(exist_ok=True)
-
 		items = []
-		with open('resources/genomes/set3/genomes.txt') as f:
+		with open(input[0]) as f:
 			for line in f:
 				fname = line.strip().rsplit('.', 1)[0] + '.fasta.gz'
 				items.append((prefix + fname, fname, None))
 
-		download_parallel(items, dl_dir)
-		outdir.symlink_to(dl_dir.name, True)
+		download_and_link(items, params['dl_dir'], output[0])
 
 
 # Download genomes for figure 6

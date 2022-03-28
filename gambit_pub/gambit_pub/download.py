@@ -3,8 +3,10 @@
 import os
 from pathlib import Path
 from urllib.request import urlretrieve
+from urllib.error import HTTPError
 import hashlib
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from time import sleep
 
 from tqdm import tqdm
 
@@ -39,7 +41,7 @@ def attempt_download(url, file, checksum=None):
 
 	return None
 
-def download_item(url, file, checksum=None, attempts=3):
+def download_item(url, file, checksum=None, attempts=3, retry_delay=.25):
 	"""Download single file.
 
 	Returns
@@ -61,11 +63,24 @@ def download_item(url, file, checksum=None, attempts=3):
 			return True, True, messages
 
 	for i in range(attempts):
+		if i > 0:
+			sleep(retry_delay)
+
 		last_err = attempt_download(url, file, checksum)
+
+		# Success
 		if not last_err:
 			return True, False, messages
 
-	messages.append(f'Download failed after {attempts} attempts. Last error: {last_err}')
+		# Only retry for HTTP errors with code not in 400 range
+		if not isinstance(last_err, HTTPError) or 400 <= last_err.code < 500:
+			messages.append(str(last_err))
+			break
+
+	else:
+		# Went through all attempts, no success
+		messages.append(f'Failed after {attempts} attempts. Last error: {last_err}')
+
 	return False, False, messages
 
 
