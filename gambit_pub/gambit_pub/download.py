@@ -1,4 +1,4 @@
-"""Utility functions to be run from the Snakemake workflow."""
+"""Functions to download and validate source files."""
 
 import os
 from pathlib import Path

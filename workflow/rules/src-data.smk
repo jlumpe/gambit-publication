@@ -27,13 +27,15 @@ rule get_genome_set_12:
 	wildcard_constraints:
 		genomeset="set[12]",
 	run:
+		from gambit_pub.download import download_parallel
+
 		outdir = Path(output[0])
 		dl_dir = outdir.parent / '.fasta-download'
 		dl_dir.mkdir(exist_ok=True)
 
 		table = pd.read_csv(outdir.parent / 'genomes.csv')
 		items = [(row.url, row.assembly_accession + '.fa.gz', row.md5) for _, row in table.iterrows()]
-		wf_utils.download_parallel(items, dl_dir)
+		download_parallel(items, dl_dir)
 
 		outdir.symlink_to(dl_dir.name, True)
 
@@ -43,6 +45,8 @@ rule get_genome_set_3:
 	output:
 		directory("resources/genomes/set3/fasta/")
 	run:
+		from gambit_pub.download import download_parallel
+
 		gs_dir = config['src_data']['genome_sets']['set3']['fasta'].rstrip('/')
 		prefix = GCS_PREFIX + gs_dir + '/'
 
@@ -56,7 +60,7 @@ rule get_genome_set_3:
 				fname = line.strip()
 				items.append((prefix + fname, fname, None))
 
-		wf_utils.download_parallel(items, dl_dir)
+		download_parallel(items, dl_dir)
 		outdir.symlink_to(dl_dir.name, True)
 
 
@@ -65,6 +69,8 @@ rule get_genome_set_3_fastq:
 	output:
 	      directory("resources/genomes/set3/fastq/")
 	run:
+		from gambit_pub.download import download_parallel
+
 		gs_dir = config['src_data']['genome_sets']['set3']['fastq'].rstrip('/')
 		prefix = GCS_PREFIX + gs_dir + '/'
 
@@ -78,7 +84,7 @@ rule get_genome_set_3_fastq:
 				fname = line.strip().rsplit('.', 1)[0] + '.fasta.gz'
 				items.append((prefix + fname, fname, None))
 
-		wf_utils.download_parallel(items, dl_dir)
+		download_parallel(items, dl_dir)
 		outdir.symlink_to(dl_dir.name, True)
 
 

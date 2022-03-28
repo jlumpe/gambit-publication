@@ -2,7 +2,6 @@ from pathlib import Path
 import os
 import pandas as pd
 from snakemake.utils import min_version
-from gambit_pub import wf_utils
 
 min_version("7.0")
 
