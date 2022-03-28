@@ -9,9 +9,6 @@ Expected Snakemake variables:
 * output: CSV file to write to.
 """
 
-import ipdb
-# ipdb.set_trace()
-
 import numpy as np
 import pandas as pd
 
