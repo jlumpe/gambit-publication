@@ -28,15 +28,19 @@ rule get_gambit_db:
 		'''
 
 
-def download_and_link(items, dl_path, link_path):
+def download_and_link(items, dl_path, link_path, threads):
 	"""Download list of files to a directory and create a symlink to that directory."""
 
 	from gambit_pub.download import download_parallel
 	from gambit_pub.utils import symlink_to_relative
 
+	# Try for a multiple of what Snakemake tells us to use because the task is io/network-bound and
+	# not cpu-bound, but enforce a maximum.
+	nworkers = min(threads * 2, 12)
+
 	dl_path = Path(dl_path)
 	dl_path.mkdir(parents=True, exist_ok=True)
-	download_parallel(items, dl_path)
+	download_parallel(items, dl_path, nworkers=nworkers)
 	symlink_to_relative(dl_path, link_path)
 
 
@@ -53,7 +57,7 @@ rule get_genome_set_12:
 	run:
 		table = pd.read_csv(input[0])
 		items = [(row.url, row.assembly_accession + '.fa.gz', row.md5) for _, row in table.iterrows()]
-		download_and_link(items, params['dl_dir'], output[0])
+		download_and_link(items, params['dl_dir'], output[0], threads)
 
 
 # Download genome set 3
@@ -74,7 +78,7 @@ rule get_genome_set_3:
 				fname = line.strip()
 				items.append((prefix + fname, fname, None))
 
-		download_and_link(items, params['dl_dir'], output[0])
+		download_and_link(items, params['dl_dir'], output[0], threads)
 
 
 # Download fastq files for genome set 3
@@ -95,7 +99,7 @@ rule get_genome_set_3_fastq:
 				fname = line.strip().rsplit('.', 1)[0] + '.fastq.gz'
 				items.append((prefix + fname, fname, None))
 
-		download_and_link(items, params['dl_dir'], output[0])
+		download_and_link(items, params['dl_dir'], output[0], threads)
 
 
 # Download genomes for figure 6
