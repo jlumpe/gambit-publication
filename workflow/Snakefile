@@ -15,7 +15,8 @@ wildcard_constraints:
 configfile: "config/config.yaml"
 
 # Running in test mode?
-if config['test']:
+TEST = config.get('test', False)
+if TEST:
 	print("Test mode enabled!")
 	# Override default config file with values in test file
 	configfile: "config/config-test.yaml"

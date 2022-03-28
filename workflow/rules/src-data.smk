@@ -44,10 +44,47 @@ def download_and_link(items, dl_path, link_path, threads):
 	symlink_to_relative(dl_path, link_path)
 
 
+# Creates truncated versions of genomes.csv and genomes.txt when in test mode
+rule truncated_genome_list:
+	output:
+		"resources/genomes/{genomeset}/genomes-test.{ext}"
+	wildcard_constraints:
+		ext='txt|csv',
+	run:
+		out_dir = Path(output[0]).parent
+		src = out_dir / ('genomes.' + wildcards['ext'])
+		n = config['genome_cap']
+		if wildcards['ext'] == 'csv':
+			n += 1  # Account for header
+
+		with open(src) as fsrc, open(output[0], 'w') as fdst:
+			for i, line in enumerate(fsrc):
+				if i >= n:
+					break
+				fdst.write(line)
+
+
+# Get file containing list of genomes for the given genome set
+def get_genomes_list_file(genomeset):
+	fname = 'genomes-test.txt' if TEST else 'genomes.txt'
+	return f'resources/genomes/{genomeset}/{fname}'
+
+def genomes_list_file(wildcards):
+	return get_genomes_list_file(wildcards.genomeset)
+
+# Get file containing table of genome attributes for the given genome set
+def get_genomes_table_file(genomeset):
+	fname = 'genomes-test.csv' if TEST else 'genomes.csv'
+	return f'resources/genomes/{genomeset}/{fname}'
+
+def genomes_table_file(wildcards):
+	return get_genomes_table_file(wildcards.genomeset)
+
+
 # Download genome set 1 or 2 (both from NCBI FTP server)
 rule get_genome_set_12:
 	input:
-		'resources/genomes/{genomeset}/genomes.csv'
+		genomes_table_file
 	output:
 		directory('resources/genomes/{genomeset}/fasta/')
 	params:
@@ -63,11 +100,11 @@ rule get_genome_set_12:
 # Download genome set 3
 rule get_genome_set_3:
 	input:
-	     'resources/genomes/set3/genomes.txt'
+		get_genomes_list_file('set3')
 	output:
 		directory('resources/genomes/set3/fasta/')
 	params:
-	      dl_dir=GENOMES_DL_DIR + 'set3/fasta/',
+		dl_dir=GENOMES_DL_DIR + 'set3/fasta/',
 	run:
 		gs_dir = config['src_data']['genome_sets']['set3']['fasta'].rstrip('/')
 		prefix = GCS_PREFIX + gs_dir + '/'
@@ -84,11 +121,11 @@ rule get_genome_set_3:
 # Download fastq files for genome set 3
 rule get_genome_set_3_fastq:
 	input:
-	     'resources/genomes/set3/genomes.txt'
+		get_genomes_list_file('set3')
 	output:
-	      directory('resources/genomes/set3/fastq/')
+		directory('resources/genomes/set3/fastq/')
 	params:
-	      dl_dir=GENOMES_DL_DIR + 'set3/fastq/',
+		dl_dir=GENOMES_DL_DIR + 'set3/fastq/',
 	run:
 		gs_dir = config['src_data']['genome_sets']['set3']['fastq'].rstrip('/')
 		prefix = GCS_PREFIX + gs_dir + '/'

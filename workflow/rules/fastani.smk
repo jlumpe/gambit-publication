@@ -23,7 +23,7 @@ def get_fastani_input(wildcards):
 # Divide query genome list into chunks so that the FastANI run time for each is reasonable.
 checkpoint fastani_query_chunks:
 	input:
-		list_file="resources/genomes/{genomeset}/genomes.txt",
+		list_file=genomes_list_file,
 	output:
 	      directory(f"{FASTANI_CHUNKS_DIR}/queries")
 	run:
@@ -36,7 +36,9 @@ checkpoint fastani_query_chunks:
 
 		# Get chunk size from config (if present), default to single chunk
 		gset_conf = config['genome_sets'].get(wildcards.genomeset, dict())
-		chunk_size = gset_conf.get('fastani_chunk_size', len(lines))
+		chunk_size = gset_conf.get('fastani_chunk_size')
+		if chunk_size is None:
+			chunk_size = len(lines)
 
 		# Write chunked list files
 		for begin in range(0, len(lines), chunk_size):
@@ -53,6 +55,7 @@ rule fastani_chunk:
 	input:
 		fasta="resources/genomes/{genomeset}/fasta",
 		query_chunks=rules.fastani_query_chunks.output[0],
+		refs=genomes_list_file,
 	output:
 		temporary(f"{FASTANI_CHUNKS_DIR}/{{chunk}}.tsv")
 	wildcard_constraints:
@@ -65,9 +68,10 @@ rule fastani_chunk:
 	     """
 		 output="$(realpath {output})"
 		 queries="$(realpath {input[query_chunks]}/{wildcards.chunk}.txt)"
+		 refs="$(realpath {input[refs]})"
 		 cd {input[fasta]}
 		 fastANI -k {params.k} --fragLen {params.fraglen} -t {threads} \\
-			 --ql "$queries" --rl ../genomes.txt -o "$output"
+			 --ql "$queries" --rl $refs -o "$output"
 		 """
 
 

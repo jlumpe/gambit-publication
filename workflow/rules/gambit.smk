@@ -4,17 +4,17 @@
 # Generate signatures for genomes in each genome set
 rule gambit_signatures:
 	input:
-		"resources/genomes/{genomeset}/fasta",
+		fasta_dir="resources/genomes/{genomeset}/fasta",
+		list_file=genomes_list_file,
 	output:
 		"intermediate-data/signatures/{genomeset}-{k}-{prefix}.h5",
 	shell:
 		"""
-		genomes_dir=$(dirname {input[0]})
 		gambit signatures create \
 			-k {wildcards.k} \
 			-p {wildcards.prefix} \
-			-l $genomes_dir/genomes.txt \
-			--ldir {input[0]} \
+			-l {input[list_file]} \
+			--ldir {input[fasta_dir]} \
 			-o {output[0]} \
 			2>&1 | cat
 		"""

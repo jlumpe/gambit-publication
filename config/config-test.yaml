@@ -3,6 +3,10 @@
 #   --config test=true
 # to the command line options.
 
+
+# Truncate all genome sets to this size
+genome_cap: 20
+
 figure_2:
   k: [9, 11, 13]
   prefix_len: [5, 6]
