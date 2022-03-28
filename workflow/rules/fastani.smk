@@ -1,9 +1,10 @@
 """
 Compute all pairwise FastANI comparisons for a given genome set.
 
-Genome set 1 is much larger than the others, and so needs to be divided up into several chunks
-to make things reasonable. The size of each chunk (number of query genomes) is determined by the
-genome_sets.{genomeset}.fastani_chunk_size config variable, if present.
+Genome set 1 is much larger than the others and FastANI starts to get very slow with this many
+genomes. To compensate we divide the query sequences into chunks so that the number of ANI values to
+be computed (nqueries * nrefs) is capped to a maximum value (set in config[fastani][chunk_size]).
+We run FastANI for each query chunk and then glue the outputs together.
 """
 
 
@@ -35,14 +36,16 @@ checkpoint fastani_query_chunks:
 			lines = list(f)
 
 		# Get chunk size from config (if present), default to single chunk
-		gset_conf = config['genome_sets'].get(wildcards.genomeset, dict())
-		chunk_size = gset_conf.get('fastani_chunk_size')
-		if chunk_size is None:
-			chunk_size = len(lines)
+		chunk_nelems = config['fastani'].get('chunk_size')
+		if chunk_nelems is None:
+			chunk_nlines = len(lines)
+		else:
+			nchunks = max(len(lines) ** 2 // chunk_nelems, 1)
+			chunk_nlines = len(lines) // nchunks
 
 		# Write chunked list files
-		for begin in range(0, len(lines), chunk_size):
-			chunk = lines[begin:begin + chunk_size]
+		for begin in range(0, len(lines), chunk_nlines):
+			chunk = lines[begin:begin + chunk_nlines]
 			end = begin + len(chunk)
 
 			with open(out_dir / f'{begin+1:03d}-{end:03d}.txt', 'w') as f:

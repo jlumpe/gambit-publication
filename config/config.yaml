@@ -12,6 +12,8 @@ gambit:
 fastani:
   k: 16  # Default
   fraglen: 3000  # Default
+  # Chunk queries so output matrices are no bigger than this
+  chunk_size: 5000
 
 
 # URLs for downloading source files
@@ -42,10 +44,3 @@ figure_2:
     - CACATAT
     - CGTTAGT
     - ACTCTTG
-
-
-# Parameters tailored to specific genome sets
-genome_sets:
-  set1:
-    # This one has way more genomes than the others, divide FastANI queries into chunks
-    fastani_chunk_size: 10

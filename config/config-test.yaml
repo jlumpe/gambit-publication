@@ -7,13 +7,10 @@
 # Truncate all genome sets to this size
 genome_cap: 20
 
+
 figure_2:
   k: [9, 11]
   prefix_len: [5, 6]
   base_prefix:
     - ATGACTG
     - ATCATTT
-
-genome_sets:
-  set1:
-    fastani_chunk_size: null
