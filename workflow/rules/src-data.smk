@@ -92,7 +92,7 @@ rule get_genome_set_3_fastq:
 		items = []
 		with open(input[0]) as f:
 			for line in f:
-				fname = line.strip().rsplit('.', 1)[0] + '.fasta.gz'
+				fname = line.strip().rsplit('.', 1)[0] + '.fastq.gz'
 				items.append((prefix + fname, fname, None))
 
 		download_and_link(items, params['dl_dir'], output[0])
