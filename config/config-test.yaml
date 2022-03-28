@@ -8,12 +8,11 @@
 genome_cap: 20
 
 figure_2:
-  k: [9, 11, 13]
+  k: [9, 11]
   prefix_len: [5, 6]
   base_prefix:
     - ATGACTG
     - ATCATTT
-    - TCTCGAT
 
 genome_sets:
   set1:
