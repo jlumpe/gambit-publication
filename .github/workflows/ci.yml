@@ -6,7 +6,7 @@ on:
   pull_request:
 
 jobs:
-  build:
+  test:
 
     runs-on: ubuntu-latest
     strategy:
@@ -50,6 +50,26 @@ jobs:
       run: mamba env update -n gambit-pub -f env.yaml
       if: steps.cache-env.outputs.cache-hit != 'true'
 
-    - name: Test workflow
+    # Environment setup done
+
+    - name: Cache source data
+      id: cache-data
+      uses: actions/cache@v2
+      with:
+        path: |
+          resources/genomes/.download
+          resources/genomes/figure_6/fasta
+#          resources/gambit-db/db-genomes.db
+#          resources/gambit-db/db-signatures.h5
+        key: conda-${{ runner.os }}--${{ runner.arch }}--${{ env.CACHE_NUMBER }}
+      env:
+        # Increment this manually every time things change
+        CACHE_NUMBER: 0
+
+    - name: Download source data
+      run: snakemake --cores all get_src_data --config test=true
+      if: steps.cache-data.outputs.cache-hit != 'true'
+
+    - name: Run workflow
       run: |
-        snakemake -l
+        snakemake -c1 all --config test=true
