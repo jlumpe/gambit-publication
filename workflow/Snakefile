@@ -36,6 +36,7 @@ include: "rules/fastani.smk"
 include: "rules/gambit.smk"
 include: "rules/figure-1.smk"
 include: "rules/figure-2.smk"
+include: "rules/figure-4.smk"
 include: "rules/figure-6.smk"
 
 
