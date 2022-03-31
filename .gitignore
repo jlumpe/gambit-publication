@@ -1,5 +1,7 @@
 /env/
+/intermediate-data/
+/results/
+
+.snakemake/
 .ipynb_checkpoints/
-__pycache__
-.snakemake
-intermediate-data/
+__pycache__/

@@ -1,4 +1,4 @@
-.download/
-*/fasta
-*/fastq
+/.download/
+*/fasta/
+*/fastq/
 */genomes-test.*
