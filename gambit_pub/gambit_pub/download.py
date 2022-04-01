@@ -5,7 +5,7 @@ from pathlib import Path
 from urllib.request import urlretrieve
 from urllib.error import HTTPError
 import hashlib
-from concurrent.futures import ThreadPoolExecutor, as_completed
+from concurrent.futures import ProcessPoolExecutor, as_completed
 from time import sleep
 
 from tqdm import tqdm
@@ -29,6 +29,8 @@ def attempt_download(url, file, checksum=None):
 	try:
 		urlretrieve(url, file)
 	except Exception as e:
+		if file.is_file():
+			file.unlink()
 		return f'Download failed: {e}'
 
 	if checksum is not None:
@@ -102,7 +104,7 @@ def download_parallel(items, out_dir, nworkers=None):
 	nexists = 0
 	nfailed = 0
 
-	with ThreadPoolExecutor(max_workers=nworkers) as executor:
+	with ProcessPoolExecutor(max_workers=nworkers) as executor:
 		future_to_file = {
 			executor.submit(download_item, url, out_dir / file, checksum): file
 			for url, file, checksum in items

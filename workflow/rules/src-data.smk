@@ -7,7 +7,12 @@ directory containing the successful downloads.
 The rule can then be rerun and it will not attempt to re-download the genomes already present.
 """
 
+# Actually download genomes to this directory
 GENOMES_DL_DIR = 'resources/genomes/.download/'
+
+# URL prefix for NCBI files
+_ncbi_protocol = 'http' if config['src_data']['ncbi']['use_http'] else 'ftp'
+NCBI_FTP_PREFIX = _ncbi_protocol + '://ftp.ncbi.nlm.nih.gov/'
 
 # Prefix for GCS URLs
 GCS_PREFIX = 'https://storage.googleapis.com/'
@@ -93,7 +98,10 @@ rule get_genome_set_12:
 		genomeset="set[12]",
 	run:
 		table = pd.read_csv(input[0])
-		items = [(row.url, row.assembly_accession + '.fa.gz', row.md5) for _, row in table.iterrows()]
+		items = [
+			(NCBI_FTP_PREFIX + row.ftp_path, row.assembly_accession + '.fa.gz', row.md5)
+			for _, row in table.iterrows()
+		]
 		download_and_link(items, params['dl_dir'], output[0], threads)
 
 
