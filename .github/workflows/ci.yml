@@ -58,7 +58,7 @@ jobs:
       with:
         path: |
           resources/genomes/.download
-          resources/genomes/figure_6/fasta
+          resources/genomes/set4/fasta
 #          resources/gambit-db/db-genomes.db
 #          resources/gambit-db/db-signatures.h5
         key: conda-${{ runner.os }}--${{ runner.arch }}--${{ env.CACHE_NUMBER }}

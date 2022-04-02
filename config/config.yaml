@@ -26,8 +26,8 @@ src_data:
     set3:
       fasta: "hesslab-gambit-public/genomes/set3/fasta/"
       fastq: "hesslab-gambit-public/genomes/set3/fastq/"
-    figure_6:
-      tarball: "hesslab-gambit-public/genomes/figure-6/fasta.tar.gz"
+    set4:
+      tarball: "hesslab-gambit-public/genomes/set4/fasta.tar.gz"
 
   ncbi:
     # Use HTTP protocol to access NCBI FTP server files instead of FTP (have had issues on some networks)
