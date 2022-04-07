@@ -18,9 +18,7 @@ def get_fig4_input(wildcards):
 	with open(get_genomes_list_file('set3')) as f:
 		names = [line.split('.')[0] for line in f]
 
-	names = [n for n in names if os.path.isfile(expand(rules.fastq_signatures.input['fastq'], file=n)[0])]
-	files = expand(rules.fastq_signatures.output, file=names)
-	return files
+	return expand(rules.fastq_signatures.output, file=names)
 
 
 rule figure_4:

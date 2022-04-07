@@ -5,14 +5,16 @@ import numpy as np
 from gambit.kmers import find_kmers
 
 
-# Factor to convert exponent from PHRED (base 10 ** (1/10)) to natural (base e)
+# Factor to convert exponent from PHRED (base 10^(1/10)) to natural (base e)
 PHRED_TO_NAT = -np.log(10) / 10
 
 def phredsum(q):
 	return np.logaddexp.reduce(np.asarray(q) * PHRED_TO_NAT) / PHRED_TO_NAT
 
+
 def get_phred(record):
 	return np.asarray(record.letter_annotations['phred_quality'])
+
 
 class PhredAccumulator:
 	"""Accumulate k-mer counts binned by aggregated PHRED score."""

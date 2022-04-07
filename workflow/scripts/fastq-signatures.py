@@ -25,14 +25,14 @@ from gambit_pub.fastq import PhredAccumulator, accumulate_kmers_fastq, phredsum
 ### Parameters ###
 
 # Way too many bins for plot, but doesn't cost much and we can re-bin later.
-MIN_PHRED = np.arange(30) + 1
+MIN_PHRED = np.arange(0, 41)
 MIN_COUNT = np.arange(100) + 1
 
 AGG_FUNCS = [np.min, phredsum]
 AGG_NAMES = ['min', 'phredsum']
 
 
-### Get fasta_sig of FASTA file ###
+### Get signatures of FASTA file ###
 
 fasta_sigs = load_signatures(snakemake.input['signatures'])
 kmerspec = fasta_sigs.kmerspec
@@ -46,15 +46,12 @@ fasta_sig_len = len(fasta_sig)
 ### Count kmers in fastq file ###
 
 seqfile = SequenceFile(snakemake.input['fastq'], 'fastq', 'gzip')
-filelen = seqfile.path.stat().st_size
 
 phred_bins = MIN_PHRED[1:]  # Left bin edges, count anything <1 as 0
 accums = [PhredAccumulator(phred_bins) for _ in AGG_FUNCS]
 
-i = 0
 for record in seqfile.parse():
     accumulate_kmers_fastq(kmerspec, record, zip(AGG_FUNCS, accums))
-    i += 1
 
 
 ### Statistics ###
@@ -80,7 +77,7 @@ for agg_name, accum in zip(AGG_NAMES, accums):
         # Which array to increment
         a = n_intersect if idx in fasta_sig else n_fastq
 
-        counts_cum = np.cumsum(kmer_counts[i, :])
+        counts_cum = np.cumsum(kmer_counts[i, ::-1])[::-1]
         for j, min_count in enumerate(MIN_COUNT):
             a[j, :] += counts_cum >= min_count
 
