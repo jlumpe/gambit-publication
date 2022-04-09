@@ -25,13 +25,21 @@ def get_md5(file):
 
 
 def attempt_download(url, file, checksum=None):
+	"""Attempt to download URL to file.
+
+	Returns
+	-------
+	(err_msg, should_retry) tuple.
+	"""
 
 	try:
 		urlretrieve(url, file)
 	except Exception as e:
 		if file.is_file():
 			file.unlink()
-		return f'Download failed: {e}'
+
+		should_retry = not (isinstance(e, HTTPError) and 400 <= e.code < 500)
+		return f'Download failed: {e}', should_retry
 
 	if checksum is not None:
 		with open(file, 'rb') as f:
@@ -39,9 +47,9 @@ def attempt_download(url, file, checksum=None):
 
 		if md5 != checksum:
 			file.unlink()
-			return 'Download appeared to complete successfully but checksum does not match.'
+			return 'Download appeared to complete successfully but checksum does not match.', True
 
-	return None
+	return None, False
 
 def download_item(url, file, checksum=None, attempts=3, retry_delay=.25):
 	"""Download single file.
@@ -55,12 +63,16 @@ def download_item(url, file, checksum=None, attempts=3, retry_delay=.25):
 	messages = []
 
 	if file.exists():
-		with open(file, 'rb') as f:
-			md5 = get_md5(f)
 
-		if checksum is not None and md5 != checksum:
-			messages += ['File exists but checksum is incorrect (partial download?). Deleting.']
-			file.unlink()
+		if checksum is not None:
+			with open(file, 'rb') as f:
+				md5 = get_md5(f)
+
+			if md5 != checksum:
+				messages += ['File exists but checksum is incorrect (partial download?). Deleting.']
+				file.unlink()
+			else:
+				return True, True, messages
 		else:
 			return True, True, messages
 
@@ -68,15 +80,14 @@ def download_item(url, file, checksum=None, attempts=3, retry_delay=.25):
 		if i > 0:
 			sleep(retry_delay)
 
-		last_err = attempt_download(url, file, checksum)
+		last_err, should_retry = attempt_download(url, file, checksum)
 
 		# Success
 		if not last_err:
 			return True, False, messages
 
-		# Only retry for HTTP errors with code not in 400 range
-		if not isinstance(last_err, HTTPError) or 400 <= last_err.code < 500:
-			messages.append(str(last_err))
+		if not should_retry:
+			messages.append(last_err)
 			break
 
 	else:

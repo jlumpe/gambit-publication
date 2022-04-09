@@ -16,6 +16,7 @@ fastani:
   chunk_size: 5000
 
 
+
 # URLs for downloading source files
 src_data:
   gambit_db:
@@ -28,6 +29,9 @@ src_data:
       fastq: "hesslab-gambit-public/genomes/set3/fastq/"
     set4:
       tarball: "hesslab-gambit-public/genomes/set4/fasta.tar.gz"
+
+  # Number of simultaneous downloads for each genome download rule
+  nworkers: 6
 
   ncbi:
     # Use HTTP protocol to access NCBI FTP server files instead of FTP (have had issues on some networks)

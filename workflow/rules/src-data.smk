@@ -5,6 +5,10 @@ and then a symlink to that directory is created as the rule's output.
 That way when some but not all downloads fail Snakemake will delete the symlink instead of the
 directory containing the successful downloads.
 The rule can then be rerun and it will not attempt to re-download the genomes already present.
+
+These rules also have an nworkers parameter, which is the number of simultaneous downloads. This is
+used instead of Snakemake's built-in "threads" variable because the download threads are IO-bound
+instead of cpu-bound.
 """
 
 # Actually download genomes to this directory
@@ -27,21 +31,17 @@ rule get_gambit_db:
 		genomes_url=GCS_PREFIX + config['src_data']['gambit_db']['genomes'],
 		signatures_url=GCS_PREFIX + config['src_data']['gambit_db']['signatures'],
 	shell:
-	    '''
+		'''
 		curl -f -o {output.genomes} {params[genomes_url]}
 		curl -f -o {output.signatures} {params[signatures_url]}
 		'''
 
 
-def download_and_link(items, dl_path, link_path, threads):
+def download_and_link(items, dl_path, link_path, nworkers):
 	"""Download list of files to a directory and create a symlink to that directory."""
 
 	from gambit_pub.download import download_parallel
 	from gambit_pub.utils import symlink_to_relative
-
-	# Try for a multiple of what Snakemake tells us to use because the task is io/network-bound and
-	# not cpu-bound, but enforce a maximum.
-	nworkers = min(threads * 2, 12)
 
 	dl_path = Path(dl_path)
 	dl_path.mkdir(parents=True, exist_ok=True)
@@ -94,6 +94,7 @@ rule get_genome_set_12:
 		directory('resources/genomes/{genomeset}/fasta/')
 	params:
 		dl_dir=GENOMES_DL_DIR + '{genomeset}/fasta/',
+		nworkers=config['src_data']['nworkers'],
 	wildcard_constraints:
 		genomeset="set[12]",
 	run:
@@ -102,7 +103,7 @@ rule get_genome_set_12:
 			(NCBI_FTP_PREFIX + row.ftp_path, row.assembly_accession + '.fa.gz', row.md5)
 			for _, row in table.iterrows()
 		]
-		download_and_link(items, params['dl_dir'], output[0], threads)
+		download_and_link(items, params['dl_dir'], output[0], params['nworkers'])
 
 
 # Download genome set 3
@@ -113,6 +114,7 @@ rule get_genome_set_3:
 		directory('resources/genomes/set3/fasta/')
 	params:
 		dl_dir=GENOMES_DL_DIR + 'set3/fasta/',
+		nworkers=config['src_data']['nworkers'],
 	run:
 		gs_dir = config['src_data']['genome_sets']['set3']['fasta'].rstrip('/')
 		prefix = GCS_PREFIX + gs_dir + '/'
@@ -123,7 +125,7 @@ rule get_genome_set_3:
 				fname = line.strip()
 				items.append((prefix + fname, fname, None))
 
-		download_and_link(items, params['dl_dir'], output[0], threads)
+		download_and_link(items, params['dl_dir'], output[0], params['nworkers'])
 
 
 # Download fastq files for genome set 3
@@ -134,6 +136,7 @@ rule get_genome_set_3_fastq:
 		directory('resources/genomes/set3/fastq/')
 	params:
 		dl_dir=GENOMES_DL_DIR + 'set3/fastq/',
+		nworkers=config['src_data']['nworkers'],
 	run:
 		gs_dir = config['src_data']['genome_sets']['set3']['fastq'].rstrip('/')
 		prefix = GCS_PREFIX + gs_dir + '/'
@@ -144,13 +147,13 @@ rule get_genome_set_3_fastq:
 				fname = line.strip().rsplit('.', 1)[0] + '.fastq.gz'
 				items.append((prefix + fname, fname, None))
 
-		download_and_link(items, params['dl_dir'], output[0], threads)
+		download_and_link(items, params['dl_dir'], output[0], params['nworkers'])
 
 
 # Download genome set 4
 rule get_genome_set_4:
 	output:
-	    directory('resources/genomes/set4/fasta'),
+		directory('resources/genomes/set4/fasta'),
 	params:
 		url=GCS_PREFIX + config['src_data']['genome_sets']['set4']['tarball'],
 	shell:
