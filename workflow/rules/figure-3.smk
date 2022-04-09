@@ -14,13 +14,13 @@ rule fastq_signatures:
 		'../scripts/fastq-signatures.py'
 
 
-def get_fig4_input(wildcards):
+def get_fig3_input(wildcards):
 	with open(get_genomes_list_file('set3')) as f:
 		names = [line.split('.')[0] for line in f]
 
 	return expand(rules.fastq_signatures.output, file=names)
 
 
-rule figure_4:
+rule figure_3:
 	input:
-	     get_fig4_input
+	     get_fig3_input
