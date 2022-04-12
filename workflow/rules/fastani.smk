@@ -26,7 +26,7 @@ checkpoint fastani_query_chunks:
 	input:
 		list_file=genomes_list_file,
 	output:
-	      directory(f"{FASTANI_CHUNKS_DIR}/queries")
+		directory(f"{FASTANI_CHUNKS_DIR}/queries")
 	run:
 		out_dir = Path(output[0])
 		out_dir.mkdir()
@@ -68,7 +68,7 @@ rule fastani_chunk:
 		fraglen=config['fastani']['fraglen'],
 	threads: workflow.cores
 	shell:
-	     """
+		"""
 		 output="$(realpath {output})"
 		 queries="$(realpath {input[query_chunks]}/{wildcards.chunk}.txt)"
 		 refs="$(realpath {input[refs]})"
@@ -81,9 +81,9 @@ rule fastani_chunk:
 # Get complete result file. This is the only rule whose output is needed in other files.
 rule fastani:
 	input:
-	     get_fastani_input
+		get_fastani_input
 	output:
-	      "intermediate-data/fastani/{genomeset}.tsv"
+		"intermediate-data/fastani/{genomeset}.tsv"
 	shell:
-	     # Concatenate all chunks into a single output file
-	     "cat {input} > {output}"
+		# Concatenate all chunks into a single output file
+		"cat {input} > {output}"

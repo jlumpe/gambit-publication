@@ -27,7 +27,7 @@ rule gambit_pw_dists:
 	output:
 		"intermediate-data/gambit-pw-dists/{genomeset}-{k}-{prefix}.csv",
 	shell:
-	    "gambit dist -s --qs {input[0]} -o {output[0]} 2>&1 | cat"
+		"gambit dist -s --qs {input[0]} -o {output[0]} 2>&1 | cat"
 
 
 rule gambit_vs_ani:

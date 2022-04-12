@@ -23,4 +23,4 @@ def get_fig3_input(wildcards):
 
 rule figure_3:
 	input:
-	     get_fig3_input
+		get_fig3_input

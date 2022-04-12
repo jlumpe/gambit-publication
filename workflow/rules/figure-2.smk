@@ -27,18 +27,18 @@ def get_fig2_input(wildcards=None):
 # Generate table of gambit/fastani correlations
 rule figure_2_stats:
 	params:
-	      params_df=get_fig2_params(),
+		params_df=get_fig2_params(),
 	input:
-	     unpack(get_fig2_input)
+		unpack(get_fig2_input)
 	output:
-	      stats="results/figure-2/gambit-ani-correlation.csv",
+		stats="results/figure-2/gambit-ani-correlation.csv",
 	script:
-	      "../scripts/figure-2-stats.py"
+		"../scripts/figure-2-stats.py"
 
 rule figure_2:
 	input:
-	     rules.figure_2_stats.output
+		rules.figure_2_stats.output
 	output:
-	      "results/figure-2/figure-2.png"
+		"results/figure-2/figure-2.png"
 	script:
-	      "../scripts/figure-2.py"
+		"../scripts/figure-2.py"
