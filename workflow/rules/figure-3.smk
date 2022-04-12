@@ -24,3 +24,5 @@ def get_fig3_input(wildcards):
 rule figure_3:
 	input:
 		get_fig3_input
+	output:
+		touch('results/figure-3/done')  # TODO
