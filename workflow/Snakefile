@@ -1,6 +1,7 @@
 from pathlib import Path
 import os
 import pandas as pd
+import numpy as np
 from snakemake.utils import min_version
 
 min_version("7.0")
@@ -34,6 +35,7 @@ COMPARISON_GENOME_SETS = ['set1', 'set2', 'set3']
 include: "rules/src-data.smk"
 include: "rules/fastani.smk"
 include: "rules/gambit.smk"
+include: "rules/db-pw-dists.smk"
 include: "rules/figure-1.smk"
 include: "rules/figure-2.smk"
 include: "rules/figure-3.smk"
