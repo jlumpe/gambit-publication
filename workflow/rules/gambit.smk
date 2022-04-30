@@ -8,6 +8,7 @@ rule gambit_signatures:
 		list_file=genomes_list_file,
 	output:
 		"intermediate-data/signatures/{genomeset}-{k}-{prefix}.h5",
+	threads: workflow.cores
 	shell:
 		"""
 		gambit signatures create \
@@ -26,6 +27,7 @@ rule gambit_pw_dists:
 		rules.gambit_signatures.output
 	output:
 		"intermediate-data/gambit-pw-dists/{genomeset}-{k}-{prefix}.csv",
+	threads: workflow.cores
 	shell:
 		"gambit dist -s --qs {input[0]} -o {output[0]} 2>&1 | cat"
 
