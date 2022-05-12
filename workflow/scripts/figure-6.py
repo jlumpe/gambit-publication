@@ -17,6 +17,17 @@ from scipy.spatial.distance import squareform
 from scipy.cluster.hierarchy import linkage
 
 
+### Plot style ###
+
+mpl_config = snakemake.config['matplotlib']
+
+plt.style.use(mpl_config['style'])
+
+PHYLOGROUP_PALETTE = 'Set1'
+FIG_HEIGHT = 4
+CMAP = 'Purples_r'
+
+
 ### Code ###
 
 def linkage_to_df(link):
@@ -103,11 +114,6 @@ def _node_segment(nodes, i, horizontal):
     return [p[::-1] for p in segment] if horizontal else segment
 
 
-### Setup ###
-
-plt.rcdefaults()
-
-
 ### Load input data ###
 
 genomes_df = pd.read_csv(snakemake.input['genomes_csv'])
@@ -134,20 +140,18 @@ for i in range(ngenomes, nnodes):
         nodes.loc[i, 'phylogroup'] = left_pg
 
 
-### Plotting parameters ###
+### Calculated plot parameters ###
 
 phylogroups = genomes_df['phylogroup'].unique()
 phylogroups.sort()
 
-phylo_palette = sns.color_palette('Set1', len(phylogroups))
+phylo_palette = sns.color_palette(PHYLOGROUP_PALETTE, len(phylogroups))
 phylo_colors = dict(zip(phylogroups, phylo_palette))
 genome_colors = [phylo_colors[pg] for pg in genomes_df['phylogroup']]
 
-fig_h = 4
-
 # Width of subplots and horizontal padding between them
 ax_pad = [.15, .45, .2]
-ax_width = [.5 * fig_h, .25, fig_h, .2]
+ax_width = [.5 * FIG_HEIGHT, .25, FIG_HEIGHT, .2]
 
 # Left side of axes in physical coordinates (inches)
 ax_left = []
@@ -163,7 +167,7 @@ ax_rects = [(l / fig_w, 0, w / fig_w, 1) for l, w in zip(ax_left, ax_width)]
 
 ### Figure/axes ###
 
-fig = plt.figure(figsize=(fig_w, fig_h))
+fig = plt.figure(figsize=(fig_w, FIG_HEIGHT))
 dg_ax = fig.add_axes(ax_rects[0])
 tbl_ax = fig.add_axes(ax_rects[1], sharey=dg_ax)
 hm_ax = fig.add_axes(ax_rects[2], sharey=dg_ax)
@@ -192,7 +196,7 @@ for side in ['left', 'top', 'right']:
 ### Heatmap ###
 
 lo = dg['leaf_order']
-hm = hm_ax.pcolor(dmat[np.ix_(lo, lo)], cmap='Purples_r')
+hm = hm_ax.pcolor(dmat[np.ix_(lo, lo)], cmap=CMAP)
 hm_ax.axis('off')
 hm_ax.set_aspect(1, share=False, adjustable='box', anchor='W')
 
@@ -225,4 +229,4 @@ plt.colorbar(
 
 ### Save ###
 
-fig.savefig(snakemake.output[0], dpi=300, bbox_inches='tight')
+fig.savefig(snakemake.output[0], bbox_inches='tight', **mpl_config['savefig_args'])
