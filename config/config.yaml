@@ -16,7 +16,6 @@ fastani:
   chunk_size: 5000
 
 
-
 # URLs for downloading source files
 src_data:
   gambit_db:
@@ -53,3 +52,14 @@ figure_2:
     - CACATAT
     - CGTTAGT
     - ACTCTTG
+
+
+# Matplotlib configuration
+matplotlib:
+  # Base style to use
+  style:
+    - default
+
+  # Arguments to savefig() function
+  savefig_args:
+    dpi: 300
