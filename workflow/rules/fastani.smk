@@ -83,7 +83,7 @@ rule fastani:
 	input:
 		get_fastani_input
 	output:
-		"intermediate-data/fastani/{genomeset}.tsv"
+		protected("intermediate-data/fastani/{genomeset}.tsv")
 	shell:
 		# Concatenate all chunks into a single output file
 		"cat {input} > {output}"
