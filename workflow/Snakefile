@@ -13,6 +13,7 @@ wildcard_constraints:
 
 
 ### Configuration ###
+
 configfile: "config/config.yaml"
 
 # Running in test mode?
@@ -22,8 +23,12 @@ if TEST:
 	# Override default config file with values in test file
 	configfile: "config/config-test.yaml"
 
-os.environ["GAMBIT_DB_PATH"] = "resources/gambit-db"
+# Environment
+os.environ.update(
+	GAMBIT_DB_PATH="resources/gambit-db",
+)
 
+# Main GAMBIT parameters
 K = config['gambit']['k']
 PREFIX = config['gambit']['prefix']
 
@@ -32,6 +37,7 @@ COMPARISON_GENOME_SETS = ['set1', 'set2', 'set3']
 
 
 ### Rules ###
+
 include: "rules/src-data.smk"
 include: "rules/fastani.smk"
 include: "rules/gambit.smk"
