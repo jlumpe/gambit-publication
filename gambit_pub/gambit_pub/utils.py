@@ -2,6 +2,7 @@
 
 from pathlib import Path
 import os
+import re
 
 
 def symlink_to_relative(dst, src, is_dir=False):
@@ -13,3 +14,10 @@ def symlink_to_relative(dst, src, is_dir=False):
     src = Path(src)
     dst_rel = os.path.relpath(dst, src.parent)
     src.symlink_to(dst_rel, is_dir)
+
+
+def genome_set_label(gset):
+    """Get a nicely formatted label for a genome set given its wildcard value."""
+    m = re.fullmatch(r'set(\d)', gset)
+    assert m is not None
+    return 'Set ' + m.group(1)

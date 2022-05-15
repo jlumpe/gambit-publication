@@ -15,7 +15,9 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from scipy.stats import spearmanr
 from matplotlib.ticker import PercentFormatter
+
 from gambit.util.misc import zip_strict
+from gambit_pub.utils import genome_set_label
 
 
 # ## Setup
@@ -64,7 +66,7 @@ fig, axes = plt.subplots(
 )
 
 for ax, (_, row), df in zip_strict(axes, stats_df.iterrows(), plot_data):
-	ax.set_title(row.genome_set)
+	ax.set_title(genome_set_label(row.genome_set))
 	ax.set_xlabel('ANI')
 
 	# Spearman correlation
