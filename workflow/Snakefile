@@ -42,10 +42,7 @@ include: "rules/src-data.smk"
 include: "rules/fastani.smk"
 include: "rules/gambit.smk"
 include: "rules/db-pw-dists.smk"
-include: "rules/figure-1.smk"
-include: "rules/figure-2.smk"
-include: "rules/figure-3.smk"
-include: "rules/figure-6.smk"
+include: "rules/figures.smk"
 
 
 rule all:
