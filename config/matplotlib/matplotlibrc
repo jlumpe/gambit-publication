@@ -1,0 +1,4 @@
+# Non-style settings for matplotlib.
+# Style settings go in ./stylelib/gambit.rcstyle
+
+savefig.dpi: 300

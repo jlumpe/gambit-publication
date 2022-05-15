@@ -19,13 +19,15 @@ from scipy.cluster.hierarchy import linkage
 
 ### Plot style ###
 
-mpl_config = snakemake.config['matplotlib']
+plt.style.use('gambit')
 
-plt.style.use(mpl_config['style'])
+plt.rcParams.update({
+    'image.cmap': 'Purples_r',
+    'axes.labelsize': 10,
+})
 
 PHYLOGROUP_PALETTE = 'Set1'
 FIG_HEIGHT = 4
-CMAP = 'Purples_r'
 
 
 ### Code ###
@@ -196,7 +198,7 @@ for side in ['left', 'top', 'right']:
 ### Heatmap ###
 
 lo = dg['leaf_order']
-hm = hm_ax.pcolor(dmat[np.ix_(lo, lo)], cmap=CMAP)
+hm = hm_ax.pcolor(dmat[np.ix_(lo, lo)])
 hm_ax.axis('off')
 hm_ax.set_aspect(1, share=False, adjustable='box', anchor='W')
 
@@ -229,4 +231,4 @@ plt.colorbar(
 
 ### Save ###
 
-fig.savefig(snakemake.output[0], bbox_inches='tight', **mpl_config['savefig_args'])
+fig.savefig(snakemake.output[0], bbox_inches='tight')

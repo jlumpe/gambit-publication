@@ -26,6 +26,8 @@ if TEST:
 # Environment
 os.environ.update(
 	GAMBIT_DB_PATH="resources/gambit-db",
+	MPLCONFIGDIR=os.path.abspath('config/matplotlib'),
+	MATPLOTLIBRC=os.path.abspath('config/matplotlib/matplotlibrc'),
 )
 
 # Main GAMBIT parameters

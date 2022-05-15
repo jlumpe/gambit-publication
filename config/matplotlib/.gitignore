@@ -1,0 +1,6 @@
+# Matplotlib caches stuff in this directory, so use a whitelist.
+*
+!.gitignore
+!matplotlibrc
+!stylelib
+!stylelib/*

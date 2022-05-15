@@ -23,12 +23,10 @@ from gambit.util.misc import zip_strict
 genome_sets = snakemake.params['genome_sets']
 ngs = len(genome_sets)
 
-mpl_config = snakemake.config['matplotlib']
-
 
 ### Plot style ###
 
-plt.style.use(mpl_config['style'])
+plt.style.use('gambit')
 
 plt.rcParams.update({
 	'axes.grid': True,
@@ -105,6 +103,6 @@ fig.tight_layout()
 
 ### Save ###
 
-fig.savefig(snakemake.output['figure'], **mpl_config['savefig_args'])
+fig.savefig(snakemake.output['figure'])
 
 stats_df.to_csv(snakemake.output['stats'], index=False)
