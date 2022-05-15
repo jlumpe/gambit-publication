@@ -47,12 +47,14 @@ include: "rules/db-pw-dists.smk"
 include: "rules/figures.smk"
 
 
+# Create all figures and tables.
 rule all:
 	input:
 		*rules.figure_1.output,
 		*rules.figure_2.output,
 		*rules.figure_3.output,
 		*rules.figure_6.output,
+	default_target: True
 
 
 # Starts IPython shell with access to global scope of workflow. For testing/development.
