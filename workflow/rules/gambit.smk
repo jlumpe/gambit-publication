@@ -8,7 +8,7 @@ rule gambit_signatures:
 		list_file=genomes_list_file,
 	output:
 		"intermediate-data/signatures/{genomeset}-{k}-{prefix}.h5",
-	threads: workflow.cores
+	# threads: workflow.cores  # This task is mostly IO-bound so let Snakemake run several at a time
 	shell:
 		"""
 		gambit signatures create \
