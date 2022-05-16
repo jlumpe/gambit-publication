@@ -72,7 +72,7 @@ for ax, (_, row), df in zip_strict(axes, stats_df.iterrows(), plot_data):
 	# Spearman correlation
 	ax.text(
 		.05, .05,
-		f'$\\rho = {row.spearmanr:.3f}$',
+		f'$\\rho = {-row.spearmanr:.3f}$',
 		ha='left',
 		va='bottom',
 		fontsize=16,
