@@ -16,52 +16,126 @@ rule figure_1:
 	script: '../scripts/figure-1.py'
 
 
-### Figure 2 ###
+### Figure 2 and supplemental figure 1 ###
 
-def get_fig2_params():
-	"""Data frame of all combinations of parameter values for figure 2."""
+@cache
+def gambit_paramspace(wildcards):
+	"""Parameter space to explore for GAMBIT distance / ANI correlation.
 
-	values = config['figure_2']
-	index = pd.MultiIndex.from_product(
-		[COMPARISON_GENOME_SETS, values['k'], values['prefix_len'], range(len(values['base_prefix']))],
-		names=['genomeset', 'k', 'prefix_len', 'prefix_version'],
-	)
-	df = index.to_frame(False)
+	The "paramspace" wildcard must be one of several predefined options.
+	"""
+	from gambit_pub.paramspace_exploration import make_params_df
 
-	df['base_prefix'] = [values['base_prefix'][v] for v in df['prefix_version']]
-	df['prefix'] = [row.base_prefix[:row.prefix_len] for _, row in df.iterrows()]
-	df['input_key'] = [
-		'{genomeset}-{k}-{prefix_len}-{prefix_version}'.format(**row.to_dict())
-		for _, row in df.iterrows()
+	values = config['gambit_param_space']
+
+	if wildcards.paramspace == 'full':
+		args = (values['k'], values['prefix_len'], values['base_prefix'])
+	elif wildcards.paramspace == 'prefix_length':
+		args = (values['k'], values['prefix_len'], values['base_prefix'][0])
+	elif wildcards.paramspace == 'prefix_sequence':
+		args = (values['k'], len(PREFIX), values['base_prefix'])
+	# elif wildcards.paramspace == 'default_only':
+	# 	args = (K, len(PREFIX), PREFIX)
+	else:
+		raise ValueError(f'Invalid value for "paramspace" wildcard: {wildcards.paramspace}')
+
+	return make_params_df(*args, COMPARISON_GENOME_SETS)
+
+def gambit_ani_correlation_input(wildcards):
+	"""Input for gambit_ani_correlation rule."""
+	params_df = gambit_paramspace(wildcards)
+	return [
+		expand(rules.gambit_vs_ani.output, **row.to_dict())[0]
+		for _, row in params_df.iterrows()
 	]
 
-	return df
-
-def get_fig2_input(wildcards=None):
-	params = get_fig2_params()
-	return {
-		row.input_key: expand(rules.gambit_vs_ani.output, **row.to_dict())[0]
-		for _, row in params.iterrows()
-	}
-
-# Generate table of gambit/fastani correlations
-rule figure_2_stats:
+# Calculate spearman correlation of GAMBIT distance vs ANI for a range of parameter values.
+# Paramspace wildcard must be one of several predefined strings.
+rule gambit_ani_correlation:
 	params:
-		params_df=get_fig2_params(),
-	input:
-		unpack(get_fig2_input)
-	output:
-		stats="results/figure-2/gambit-ani-correlation.csv",
-	script:
-		"../scripts/figure-2-stats.py"
+	      params_df=gambit_paramspace,
+	input: gambit_ani_correlation_input,
+	output: 'results/gambit-ani-correlation/{paramspace}.csv'
+	script: '../scripts/gambit-vs-ani-correlation.py'
 
-rule figure_2:
+
+rule figure_2a:
+	input: expand(rules.gambit_ani_correlation.output, paramspace='prefix_length')
+	output: 'results/figure-2/figure-2a.png'
+	run:
+		import gambit_pub.paramspace_exploration as pex
+
+		paramdata = pex.get_param_data(input[0], config)
+
+		pex.set_style()
+		fg = pex.spearman_vs_k(
+			paramdata,
+			col='prefix_len',
+		)
+
+		for plen, ax in fg.axes_dict.items():
+			ax.set_title(paramdata.prefix_map[plen, 0])
+
+		pex.highlight_default_axis(fg.axes_dict[paramdata.dflt_plen])
+
+		fg.figure.savefig(output[0])
+
+rule figure_2b:
+	input: expand(rules.gambit_ani_correlation.output, paramspace='prefix_sequence')
+	output: 'results/figure-2/figure-2b.png'
+	run:
+		import gambit_pub.paramspace_exploration as pex
+
+		paramdata = pex.get_param_data(input[0], config)
+
+		pex.set_style()
+		fg = pex.spearman_vs_k(
+			paramdata,
+			col='prefix_version',
+			col_wrap=4,
+		)
+
+		for pver, ax in fg.axes_dict.items():
+			ax.set_title(paramdata.prefix_map[paramdata.dflt_plen, pver])
+
+		pex.highlight_default_axis(fg.axes_dict[paramdata.dflt_pver])
+
+		fg.figure.savefig(output[0])
+
+rule figure2:
 	input:
-		rules.figure_2_stats.output
-	output:
-		"results/figure-2/figure-2.png"
-	script:
-		"../scripts/figure-2.py"
+		rules.figure_2a.output,
+		rules.figure_2b.output,
+	output: touch('results/figure-2/.completed')
+
+
+rule supplemental_figure_1:
+	input: expand(rules.gambit_ani_correlation.output, paramspace='full')
+	output: 'results/supplemental-figure-1/supplemental-figure-1.png'
+	run:
+		import gambit_pub.paramspace_exploration as pex
+		import matplotlib as mpl
+
+		paramdata = pex.get_param_data(input[0], config)
+
+		pex.set_style()
+		mpl.rcParams.update({
+			'axes.titlesize': 12,
+		})
+
+		fg = pex.spearman_vs_k(
+			paramdata,
+			col='prefix_version',
+			row='prefix_len',
+			height=2,
+		)
+
+		for (plen, pver), ax in fg.axes_dict.items():
+			ax.set_title(paramdata.prefix_map[plen, pver])
+
+		pex.highlight_default_axis(fg.axes_dict[paramdata.dflt_plen, paramdata.dflt_pver])
+
+		fg.figure.savefig(output[0])
 
 
 ### Figure 3 ###
