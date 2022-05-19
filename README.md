@@ -22,7 +22,7 @@ following targets individually:
 
 ## Directory structure
 
-* `workflow/`: Snakemake workflow files as well as related Python scripts and Jupyter notebooks.
+* `workflow/`: Snakemake workflow files and related scripts.
 * `config/`: Workflow configuration files.
 * `resources/`: Input data.
   * `genomes/`: Sets of bacterial genomes used for analysis.
@@ -36,6 +36,9 @@ following targets individually:
 ## Setup
 
 ### Required software
+
+This workflow has been built and tested for Linux only. It may work on Mac (haven't tested) but I
+believe there are issues preventing it from running on Windows.
 
 All software dependencies are installed using the [conda](https://docs.conda.io) package manager.
 If you do not already have it installed, I recommend using the Miniconda installer available
