@@ -172,6 +172,6 @@ rule get_genome_set_4:
 # Download all source data
 rule get_src_data:
 	input:
-		# *rules.get_gambit_db.output,
+		*rules.get_gambit_db.output,
 		*expand('resources/genomes/{gset}/fasta', gset=['set1', 'set2', 'set3', 'set4']),
 		rules.get_genome_set_3_fastq.output,
