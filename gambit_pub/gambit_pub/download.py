@@ -7,6 +7,7 @@ from urllib.error import HTTPError
 import hashlib
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from time import sleep
+from contextlib import nullcontext
 
 from tqdm import tqdm
 
@@ -97,7 +98,7 @@ def download_item(url, file, checksum=None, attempts=3, retry_delay=.25):
 	return False, False, messages
 
 
-def download_parallel(items, out_dir, nworkers=None):
+def download_parallel(items, out_dir, nworkers=None, progress=False, desc=None):
 	"""Download multiple files in parallel.
 
 	Parameters
@@ -106,6 +107,10 @@ def download_parallel(items, out_dir, nworkers=None):
 		``(url, file, checksum)`` tuples.
 	out_dir
 	nworkers: int
+	progress: bool
+		Display progress bar.
+	desc: str
+		Description on progress bar.
 	"""
 	out_dir = Path(out_dir)
 	if nworkers is None:
@@ -121,13 +126,23 @@ def download_parallel(items, out_dir, nworkers=None):
 			for url, file, checksum in items
 		}
 
-		with tqdm(as_completed(future_to_file), total=len(future_to_file)) as pbar:
-			for future in pbar:
+		if progress:
+			pbar = tqdm(as_completed(future_to_file), total=len(future_to_file), desc=desc)
+			pbar_ctx = pbar
+			futures_iter = pbar
+			print_msg = pbar.write
+		else:
+			pbar_ctx = nullcontext()
+			futures_iter = as_completed(future_to_file)
+			print_msg = print
+
+		with pbar_ctx:
+			for future in futures_iter:
 				file = future_to_file[future]
 				success, exists, messages = future.result()
 
 				for msg in messages:
-					pbar.write(f'{file}: {msg}')
+					print_msg(f'{file}: {msg}')
 
 				if exists:
 					nexists += 1

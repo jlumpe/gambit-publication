@@ -3,6 +3,11 @@
 test: false
 
 
+# Whether to display progress bars for certain rules
+# Output can get screwed up if there are other running rules also printing to stdout
+show_progress: false
+
+
 # Standard parameters for GAMBIT command line
 gambit:
   k: 11

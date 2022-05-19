@@ -9,7 +9,7 @@ Expected Snakemake variables:
 	chunk1: Index of 1st chunk.
 	chunk2: Index of 2nd chunk (>= first).
 * params
-	* show_progress: Whether to display the progress bar
+	* show_progress: Whether to display the progress bar.
 * output
 """
 

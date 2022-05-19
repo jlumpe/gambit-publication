@@ -25,7 +25,7 @@ rule db_pw_dists_chunk:
 		chunk1='\d+',
 		chunk2='\d+',
 	params:
-		show_progress=False,  # Set to True to show progress bar for debugging
+		show_progress=config['show_progress'],  # Display progress bar
 	threads: workflow.cores
 	script: '../scripts/db-pw-dists-chunk.py'
 

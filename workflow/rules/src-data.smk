@@ -37,7 +37,7 @@ rule get_gambit_db:
 		'''
 
 
-def download_and_link(items, dl_path, link_path, nworkers):
+def download_and_link(items, dl_path, link_path, nworkers, **kw):
 	"""Download list of files to a directory and create a symlink to that directory."""
 
 	from gambit_pub.download import download_parallel
@@ -45,7 +45,7 @@ def download_and_link(items, dl_path, link_path, nworkers):
 
 	dl_path = Path(dl_path)
 	dl_path.mkdir(parents=True, exist_ok=True)
-	download_parallel(items, dl_path, nworkers=nworkers)
+	download_parallel(items, dl_path, nworkers=nworkers, **kw)
 	symlink_to_relative(dl_path, link_path)
 
 
@@ -95,6 +95,7 @@ rule get_genome_set_12:
 	params:
 		dl_dir=GENOMES_DL_DIR + '{genomeset}/fasta/',
 		nworkers=config['src_data']['nworkers'],
+		show_progress=config['show_progress'],  # Show progress bar
 	wildcard_constraints:
 		genomeset="set[12]",
 	run:
@@ -103,7 +104,8 @@ rule get_genome_set_12:
 			(NCBI_FTP_PREFIX + row.ftp_path, row.assembly_accession + '.fa.gz', row.md5)
 			for _, row in table.iterrows()
 		]
-		download_and_link(items, params['dl_dir'], output[0], params['nworkers'])
+		download_and_link(items, params['dl_dir'], output[0], params['nworkers'],
+		                  progress=params['show_progress'], desc=f'{wildcards.genomeset} FASTA')
 
 
 # Download genome set 3
@@ -115,6 +117,7 @@ rule get_genome_set_3:
 	params:
 		dl_dir=GENOMES_DL_DIR + 'set3/fasta/',
 		nworkers=config['src_data']['nworkers'],
+		show_progress=config['show_progress'],  # Show progress bar
 	run:
 		gs_dir = config['src_data']['genome_sets']['set3']['fasta'].rstrip('/')
 		prefix = GCS_PREFIX + gs_dir + '/'
@@ -125,7 +128,8 @@ rule get_genome_set_3:
 				fname = line.strip()
 				items.append((prefix + fname, fname, None))
 
-		download_and_link(items, params['dl_dir'], output[0], params['nworkers'])
+		download_and_link(items, params['dl_dir'], output[0], params['nworkers'],
+		                  progress=params['show_progress'], desc='set3 FASTA')
 
 
 # Download fastq files for genome set 3
@@ -137,6 +141,7 @@ rule get_genome_set_3_fastq:
 	params:
 		dl_dir=GENOMES_DL_DIR + 'set3/fastq/',
 		nworkers=config['src_data']['nworkers'],
+		show_progress=config['show_progress'],  # Show progress bar
 	run:
 		gs_dir = config['src_data']['genome_sets']['set3']['fastq'].rstrip('/')
 		prefix = GCS_PREFIX + gs_dir + '/'
@@ -147,7 +152,8 @@ rule get_genome_set_3_fastq:
 				fname = line.strip().rsplit('.', 1)[0] + '.fastq.gz'
 				items.append((prefix + fname, fname, None))
 
-		download_and_link(items, params['dl_dir'], output[0], params['nworkers'])
+		download_and_link(items, params['dl_dir'], output[0], params['nworkers'],
+		                  progress=params['show_progress'], desc='set3 FASTQ')
 
 
 # Download genome set 4
