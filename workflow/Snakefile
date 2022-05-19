@@ -4,11 +4,12 @@ from functools import lru_cache as cache
 import pandas as pd
 import numpy as np
 from snakemake.utils import min_version
+from gambit.util.io import read_lines, write_lines
 
 min_version("7.0")
 
 wildcard_constraints:
-	genomeset="\w+",
+	genomeset="set[1234]",
 	k="\d+",
 	prefix="[ACGT]+",
 

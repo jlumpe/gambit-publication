@@ -11,8 +11,11 @@ used instead of Snakemake's built-in "threads" variable because the download thr
 instead of cpu-bound.
 """
 
+# Store variations of resource files here for use in test mode
+RESOURCES_TEST_DIR = 'resources/.test'
+
 # Actually download genomes to this directory
-GENOMES_DL_DIR = 'resources/genomes/.download/'
+GENOMES_DL_DIR = 'resources/genomes/.download'
 
 # URL prefix for NCBI files
 _ncbi_protocol = 'http' if config['src_data']['ncbi']['use_http'] else 'ftp'
@@ -49,51 +52,54 @@ def download_and_link(items, dl_path, link_path, nworkers, **kw):
 	symlink_to_relative(dl_path, link_path)
 
 
-# Creates truncated versions of genomes.csv and genomes.txt when in test mode
+def _get_genomeset(wc_or_gset):
+	"""Get genome set ID string from argument."""
+	if isinstance(wc_or_gset, str):  # Given the ID itself
+		return wc_or_gset
+	elif wc_or_gset is None:  # None, return wildcard placeholder
+		return '{genomeset}'
+	else:  # Assume wildcards object
+		return wc_or_gset.genomeset
+
+def get_genomes_list_file(wildcards_or_genomeset, test=TEST):
+	"""Get the genomes.txt file for given genome set, using reduced version in test mode."""
+	gset = _get_genomeset(wildcards_or_genomeset)
+	parent_dir = RESOURCES_TEST_DIR if test else 'resources'
+	return f'{parent_dir}/genomes/{gset}/genomes.txt'
+
+def get_genomes_table_file(wildcards_or_genomeset, test=TEST):
+	"""Get the genomes.txt file for given genome set, using reduced version in test mode."""
+	gset = _get_genomeset(wildcards_or_genomeset)
+	parent_dir = RESOURCES_TEST_DIR if test else 'resources'
+	return f'{parent_dir}/genomes/{gset}/genomes.csv'
+
+
+# Create truncated versions of genomes.txt when in test mode
 rule truncated_genome_list:
-	output:
-		"resources/genomes/{genomeset}/genomes-test.{ext}"
-	wildcard_constraints:
-		ext='txt|csv',
-	run:
-		out_dir = Path(output[0]).parent
-		src = out_dir / ('genomes.' + wildcards['ext'])
-		n = config['genome_cap']
-		if wildcards['ext'] == 'csv':
-			n += 1  # Account for header
-
-		with open(src) as fsrc, open(output[0], 'w') as fdst:
-			for i, line in enumerate(fsrc):
-				if i >= n:
-					break
-				fdst.write(line)
+	input: get_genomes_list_file(None, test=False)
+	output: get_genomes_list_file(None, test=True)
+	params:
+		nlines=config['test_mode']['genome_cap'],
+	shell:
+		"head -n {params[n]} {input} > {output}"
 
 
-# Get file containing list of FASTA files for the given genome set
-def get_genomes_list_file(genomeset):
-	fname = 'genomes-test.txt' if TEST else 'genomes.txt'
-	return f'resources/genomes/{genomeset}/{fname}'
-
-def genomes_list_file(wildcards):
-	return get_genomes_list_file(wildcards.genomeset)
-
-# Get file containing table of genome attributes for the given genome set
-def get_genomes_table_file(genomeset):
-	fname = 'genomes-test.csv' if TEST else 'genomes.csv'
-	return f'resources/genomes/{genomeset}/{fname}'
-
-def genomes_table_file(wildcards):
-	return get_genomes_table_file(wildcards.genomeset)
+# Create truncated versions of genomes.csv when in test mode
+rule truncated_genome_table:
+	input: get_genomes_table_file(None, test=False)
+	output: get_genomes_table_file(None, test=True)
+	params:
+	      nlines=config['test_mode']['genome_cap'] + 1,
+	shell:
+		"head -n {params[n]} {input} > {output}"
 
 
 # Download FASTA files for genome set 1 or 2 (both from NCBI FTP server)
 rule get_genome_set_12:
-	input:
-		genomes_table_file
-	output:
-		directory('resources/genomes/{genomeset}/fasta/')
+	input: get_genomes_table_file
+	output: directory('resources/genomes/{genomeset}/fasta/')
 	params:
-		dl_dir=GENOMES_DL_DIR + '{genomeset}/fasta/',
+		dl_dir=f'{GENOMES_DL_DIR}/{{genomeset}}/fasta/',
 		nworkers=config['src_data']['nworkers'],
 		show_progress=config['show_progress'],  # Show progress bar
 	wildcard_constraints:
@@ -164,8 +170,8 @@ rule get_genome_set_5:
 		url=GCS_PREFIX + config['src_data']['genome_sets']['set5']['tarball'],
 	shell:
 		"""
-		parent=$(dirname {output})
-		curl {params[url]} | tar -xzf - -C $parent
+		mkdir {output}
+		curl {params[url]} | tar -xzf - -C {output} --strip-components=1
 		"""
 
 

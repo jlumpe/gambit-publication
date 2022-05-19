@@ -5,7 +5,7 @@
 rule gambit_signatures:
 	input:
 		fasta_dir="resources/genomes/{genomeset}/fasta",
-		list_file=genomes_list_file,
+		list_file=get_genomes_list_file,
 	output:
 		"intermediate-data/signatures/{genomeset}-{k}-{prefix}.h5",
 	# threads: workflow.cores  # This task is mostly IO-bound so let Snakemake run several at a time

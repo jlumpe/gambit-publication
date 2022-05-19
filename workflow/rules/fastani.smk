@@ -24,7 +24,7 @@ def get_fastani_input(wildcards):
 # Divide query genome list into chunks so that the FastANI run time for each is reasonable.
 checkpoint fastani_query_chunks:
 	input:
-		list_file=genomes_list_file,
+		list_file=get_genomes_list_file,
 	output:
 		directory(f"{FASTANI_CHUNKS_DIR}/queries")
 	run:
@@ -58,7 +58,7 @@ rule fastani_chunk:
 	input:
 		fasta="resources/genomes/{genomeset}/fasta",
 		query_chunks=rules.fastani_query_chunks.output[0],
-		refs=genomes_list_file,
+		refs=get_genomes_list_file,
 	output:
 		temporary(f"{FASTANI_CHUNKS_DIR}/{{chunk}}.tsv")
 	wildcard_constraints:

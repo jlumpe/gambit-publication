@@ -4,10 +4,6 @@
 # to the command line options.
 
 
-# Truncate all genome sets to this size
-genome_cap: 20
-
-
 gambit_param_space:
   k: [9, 11]
   prefix_len: [4, 5]

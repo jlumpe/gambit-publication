@@ -62,3 +62,10 @@ gambit_param_space:
     - CACATAT
     - CGTTAGT
     - ACTCTTG
+
+
+# Options for test mode
+# For test mode overrides to options already defined in this file, see config-test.yaml.
+test_mode:
+  # Truncate all genome sets to this size
+  genome_cap: 20
