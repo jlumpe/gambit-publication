@@ -64,5 +64,5 @@ sets will be downloaded as needed when running the workflow.
 
 ## Development
 
-You can enable "test mode" by adding `--config test=true` to the command line options. This loads
+You can enable "test mode" by adding `--config test=1` to the command line options. This loads
 an alternate set of parameters which greatly reduces the amount of work to be done.

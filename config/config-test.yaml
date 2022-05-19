@@ -1,6 +1,6 @@
 # Override parameters in main config file for testing
 # Use this by adding
-#   --config test=true
+#   --config test=1
 # to the command line options.
 
 
