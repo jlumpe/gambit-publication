@@ -57,14 +57,14 @@ rule main:
 		*rules.figure_2.output,
 		*rules.figure_3.output,
 		*rules.figure_6.output,
-	output: 'results/.main-completed'
+	output: touch('results/.main-completed')
 	default_target: True
 
 # Create supplemental figures and tables.
 rule supplemental:
 	input:
 		*rules.supplemental_figure_1
-	output: 'results/.supplemental-completed'
+	output: touch('results/.supplemental-completed')
 
 # Create all figures and tables.
 rule all:
