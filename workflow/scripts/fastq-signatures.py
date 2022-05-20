@@ -1,18 +1,21 @@
 """
 Generate k-mer signatures from a FASTQ file with a range of parameter values, and calculate Jaccard
-distances to the fasta_sig derived from the assembled FASTA file.
+distances to the signature derived from the assembled FASTA file.
 
 This uses custom code to do all the parameters at once, so we're not using the GAMBIT CLI or
-standard API functions for fasta_sig and distance calculation.
+standard API functions for signature and distance calculation.
 
 Expected Snakemake variables:
 * input
   * signatures: Signature file derived from FASTA files.
-  * fastq: FASTQ file.
+  * fastq_dir: Directory containing FASTQ files.
 * params
   * fasta_name: Name of FASTA file to look up the correct signature.
+  * fastq_name: Name of FASTQ file.
 * output: CSV file to write results to.
 """
+
+import os
 
 import numpy as np
 import pandas as pd
@@ -45,7 +48,8 @@ fasta_sig_len = len(fasta_sig)
 
 ### Count kmers in fastq file ###
 
-seqfile = SequenceFile(snakemake.input['fastq'], 'fastq', 'gzip')
+fastq_file = os.path.join(snakemake.input['fastq_dir'], snakemake.params['fastq_name'])
+seqfile = SequenceFile(fastq_file, 'fastq', 'gzip')
 
 phred_bins = MIN_PHRED[1:]  # Left bin edges, count anything <1 as 0
 accums = [PhredAccumulator(phred_bins) for _ in AGG_FUNCS]

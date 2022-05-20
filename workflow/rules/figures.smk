@@ -144,11 +144,12 @@ rule supplemental_figure_1:
 rule fastq_signatures:
 	input:
 		signatures=expand(rules.gambit_signatures.output, genomeset='set3', k=K, prefix=PREFIX)[0],
-		fastq='resources/genomes/set3/fastq/{file}.fastq.gz',
+		fastq_dir='resources/genomes/set3/fastq',
 	output:
 		'intermediate-data/fastq-signatures/{file}.csv'
 	params:
 		fasta_name='{file}.fasta',
+		fastq_name='{file}.fastq.gz',
 	wildcard_constraints:
 		file=r'[\w-]+',
 	script:
