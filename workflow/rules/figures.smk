@@ -102,7 +102,7 @@ rule figure_2b:
 
 		fg.figure.savefig(output[0])
 
-rule figure2:
+rule figure_2:
 	input:
 		rules.figure_2a.output,
 		rules.figure_2b.output,
