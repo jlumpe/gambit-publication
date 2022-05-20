@@ -34,6 +34,8 @@ src_data:
 #      fasta-a: "hesslab-gambit-public/genomes/set3/fasta-a/"
 #      fasta-b: "hesslab-gambit-public/genomes/set3/fasta-b/"
       fastq: "hesslab-gambit-public/genomes/set3/fastq/"
+    set4:
+      fasta: "hesslab-gambit-public/genomes/set4/fasta/"
     set5:
       tarball: "hesslab-gambit-public/genomes/set5/fasta.tar.gz"
 

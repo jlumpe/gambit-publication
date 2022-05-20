@@ -38,7 +38,7 @@ K = config['gambit']['k']
 PREFIX = config['gambit']['prefix']
 
 # Main genome sets compared in figures 1 and 2
-COMPARISON_GENOME_SETS = ['set1', 'set2', 'set3']
+COMPARISON_GENOME_SETS = ['set1', 'set2', 'set3', 'set4']
 
 
 ### Rules ###
