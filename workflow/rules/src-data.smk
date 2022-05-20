@@ -108,25 +108,28 @@ rule get_genome_set_12:
 		                  progress=params['show_progress'], desc=f'{wildcards.genomeset} FASTA')
 
 
-# Download FASTA files for genome set 3
-rule get_genome_set_3:
+# Download FASTA files for genome sets 3 and 4
+rule get_genome_set_34:
 	input:
-		get_genomes_list_file('set3')
+		get_genomes_list_file
 	output:
-		directory('resources/genomes/set3/fasta/')
+		directory('resources/genomes/{genomeset}/fasta/')
 	params:
-		dl_dir=GENOMES_DL_DIR + 'set3/fasta/',
+		dl_dir=GENOMES_DL_DIR + '{genomeset}/fasta/',
 		nworkers=config['src_data']['nworkers'],
 		show_progress=config['show_progress'],  # Show progress bar
+	wildcard_constraints:
+		genomeset="set[34]",
 	run:
 		from gambit.util.io import read_lines
 
-		gs_dir = config['src_data']['genome_sets']['set3']['fasta'].rstrip('/')
+		gset = wildcards.genomeset
+		gs_dir = config['src_data']['genome_sets'][gset]['fasta'].rstrip('/')
 		prefix = GCS_PREFIX + gs_dir + '/'
 		items = [(prefix + fname, fname, None) for fname in read_lines(input[0])]
 
 		download_and_link(items, params['dl_dir'], output[0], params['nworkers'],
-		                  progress=params['show_progress'], desc='set3 FASTA')
+		                  progress=params['show_progress'], desc=f'{gset} FASTA')
 
 
 # Download FASTQ files for genome set 3
@@ -170,5 +173,5 @@ rule get_genome_set_5:
 rule get_src_data:
 	input:
 		*rules.get_gambit_db.output,
-		*expand('resources/genomes/{gset}/fasta', gset=['set1', 'set2', 'set3', 'set5']),
+		*expand('resources/genomes/{gset}/fasta', gset=['set1', 'set2', 'set3', 'set4', 'set5']),
 		*rules.get_genome_set_3_fastq.output,
