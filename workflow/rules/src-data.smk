@@ -69,7 +69,7 @@ rule truncated_genome_list:
 				fdst.write(line)
 
 
-# Get file containing list of genomes for the given genome set
+# Get file containing list of FASTA files for the given genome set
 def get_genomes_list_file(genomeset):
 	fname = 'genomes-test.txt' if TEST else 'genomes.txt'
 	return f'resources/genomes/{genomeset}/{fname}'
@@ -86,7 +86,7 @@ def genomes_table_file(wildcards):
 	return get_genomes_table_file(wildcards.genomeset)
 
 
-# Download genome set 1 or 2 (both from NCBI FTP server)
+# Download FASTA files for genome set 1 or 2 (both from NCBI FTP server)
 rule get_genome_set_12:
 	input:
 		genomes_table_file
@@ -108,7 +108,7 @@ rule get_genome_set_12:
 		                  progress=params['show_progress'], desc=f'{wildcards.genomeset} FASTA')
 
 
-# Download genome set 3
+# Download FASTA files for genome set 3
 rule get_genome_set_3:
 	input:
 		get_genomes_list_file('set3')
@@ -119,20 +119,17 @@ rule get_genome_set_3:
 		nworkers=config['src_data']['nworkers'],
 		show_progress=config['show_progress'],  # Show progress bar
 	run:
+		from gambit.util.io import read_lines
+
 		gs_dir = config['src_data']['genome_sets']['set3']['fasta'].rstrip('/')
 		prefix = GCS_PREFIX + gs_dir + '/'
-
-		items = []
-		with open(input[0]) as f:
-			for line in f:
-				fname = line.strip()
-				items.append((prefix + fname, fname, None))
+		items = [(prefix + fname, fname, None) for fname in read_lines(input[0])]
 
 		download_and_link(items, params['dl_dir'], output[0], params['nworkers'],
 		                  progress=params['show_progress'], desc='set3 FASTA')
 
 
-# Download fastq files for genome set 3
+# Download FASTQ files for genome set 3
 rule get_genome_set_3_fastq:
 	input:
 		get_genomes_list_file('set3')
@@ -156,7 +153,7 @@ rule get_genome_set_3_fastq:
 		                  progress=params['show_progress'], desc='set3 FASTQ')
 
 
-# Download genome set 5
+# Download FASTA files for genome set 5
 rule get_genome_set_5:
 	output:
 		directory('resources/genomes/set5/fasta'),
@@ -174,4 +171,4 @@ rule get_src_data:
 	input:
 		*rules.get_gambit_db.output,
 		*expand('resources/genomes/{gset}/fasta', gset=['set1', 'set2', 'set3', 'set5']),
-		rules.get_genome_set_3_fastq.output,
+		*rules.get_genome_set_3_fastq.output,
