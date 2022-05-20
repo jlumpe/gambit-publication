@@ -48,6 +48,7 @@ include: "rules/fastani.smk"
 include: "rules/gambit.smk"
 include: "rules/db-pw-dists.smk"
 include: "rules/figures.smk"
+include: "rules/supplemental.smk"
 
 
 # Create primary figures and tables.

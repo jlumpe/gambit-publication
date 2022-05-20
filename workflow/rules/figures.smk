@@ -16,7 +16,7 @@ rule figure_1:
 	script: '../scripts/figure-1.py'
 
 
-### Figure 2 and supplemental figure 1 ###
+### Figure 2 ###
 
 @cache
 def gambit_paramspace(wildcards):
@@ -50,7 +50,7 @@ def gambit_ani_correlation_input(wildcards):
 	]
 
 # Calculate spearman correlation of GAMBIT distance vs ANI for a range of parameter values.
-# Paramspace wildcard must be one of several predefined strings.
+# "paramspace" wildcard must be one of several predefined strings.
 rule gambit_ani_correlation:
 	params:
 	      params_df=gambit_paramspace,
@@ -107,35 +107,6 @@ rule figure_2:
 		rules.figure_2a.output,
 		rules.figure_2b.output,
 	output: touch('results/figure-2/.completed')
-
-
-rule supplemental_figure_1:
-	input: expand(rules.gambit_ani_correlation.output, paramspace='full')
-	output: 'results/supplemental-figure-1/supplemental-figure-1.png'
-	run:
-		import gambit_pub.paramspace_exploration as pex
-		import matplotlib as mpl
-
-		paramdata = pex.get_param_data(input[0], config)
-
-		pex.set_style()
-		mpl.rcParams.update({
-			'axes.titlesize': 12,
-		})
-
-		fg = pex.spearman_vs_k(
-			paramdata,
-			col='prefix_version',
-			row='prefix_len',
-			height=2,
-		)
-
-		for (plen, pver), ax in fg.axes_dict.items():
-			ax.set_title(paramdata.prefix_map[plen, pver])
-
-		pex.highlight_default_axis(fg.axes_dict[paramdata.dflt_plen, paramdata.dflt_pver])
-
-		fg.figure.savefig(output[0])
 
 
 ### Figure 3 ###
