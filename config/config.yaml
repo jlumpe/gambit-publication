@@ -31,9 +31,11 @@ src_data:
   genome_sets:
     set3:
       fasta: "hesslab-gambit-public/genomes/set3/fasta/"
+#      fasta-a: "hesslab-gambit-public/genomes/set3/fasta-a/"
+#      fasta-b: "hesslab-gambit-public/genomes/set3/fasta-b/"
       fastq: "hesslab-gambit-public/genomes/set3/fastq/"
-    set4:
-      tarball: "hesslab-gambit-public/genomes/set4/fasta.tar.gz"
+    set5:
+      tarball: "hesslab-gambit-public/genomes/set5/fasta.tar.gz"
 
   # Number of simultaneous downloads for each genome download rule
   nworkers: 6

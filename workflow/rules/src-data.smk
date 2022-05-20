@@ -156,12 +156,12 @@ rule get_genome_set_3_fastq:
 		                  progress=params['show_progress'], desc='set3 FASTQ')
 
 
-# Download genome set 4
-rule get_genome_set_4:
+# Download genome set 5
+rule get_genome_set_5:
 	output:
-		directory('resources/genomes/set4/fasta'),
+		directory('resources/genomes/set5/fasta'),
 	params:
-		url=GCS_PREFIX + config['src_data']['genome_sets']['set4']['tarball'],
+		url=GCS_PREFIX + config['src_data']['genome_sets']['set5']['tarball'],
 	shell:
 		"""
 		parent=$(dirname {output})
@@ -173,5 +173,5 @@ rule get_genome_set_4:
 rule get_src_data:
 	input:
 		*rules.get_gambit_db.output,
-		*expand('resources/genomes/{gset}/fasta', gset=['set1', 'set2', 'set3', 'set4']),
+		*expand('resources/genomes/{gset}/fasta', gset=['set1', 'set2', 'set3', 'set5']),
 		rules.get_genome_set_3_fastq.output,

@@ -1,4 +1,4 @@
-# Genome Set 4
+# Genome Set 5
 
 Set of 29 E. coli genomes isolated and sequenced by Stephens et al 2020. The `genomes.csv` file
 includes MLST and phylotype annotations. For a more complete version, see Table S1 of the paper.
