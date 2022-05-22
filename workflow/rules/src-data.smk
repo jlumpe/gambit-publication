@@ -139,27 +139,26 @@ rule get_genome_set_34:
 
 
 # Download FASTQ files for genome set 3
+# Unlike the FASTA download rules, this one operates on one FASTQ file at a time because they are
+# large and not every one is used.
 rule get_genome_set_3_fastq:
-	input:
-		get_genomes_list_file('set3')
 	output:
-		directory('resources/genomes/set3/fastq/')
+		'resources/genomes/set3/fastq/{genome}.fastq.gz'
 	params:
-		dl_dir=GENOMES_DL_DIR + 'set3/fastq/',
-		nworkers=config['src_data']['nworkers'],
-		show_progress=config['show_progress'],  # Show progress bar
-	run:
-		gs_dir = config['src_data']['genome_sets']['set3']['fastq'].rstrip('/')
-		prefix = GCS_PREFIX + gs_dir + '/'
+		gs_dir=GCS_PREFIX + config['src_data']['genome_sets']['set3']['fastq'].rstrip('/'),
+	shell:
+		"curl {params[gs_dir]}/{wildcards[genome]}.fastq.gz -o {output}"
 
-		items = []
-		with open(input[0]) as f:
-			for line in f:
-				fname = line.strip().rsplit('.', 1)[0] + '.fastq.gz'
-				items.append((prefix + fname, fname, None))
 
-		download_and_link(items, params['dl_dir'], output[0], params['nworkers'],
-		                  progress=params['show_progress'], desc='set3 FASTQ')
+def get_genome_set_3_fastq_files(wildcards=None):
+	list_file = get_genomes_list_file('set3')
+	genomes = [file.rsplit('.', 1)[0] for file in read_lines(list_file)]
+	return expand(rules.get_genome_set_3_fastq.output, genome=genomes)
+
+# Download FASTQ files for all set 3 genomes
+# Not needed by main figures and tables and not included in get_src_data rule
+rule get_genome_set_3_fastq_all:
+	input: get_genome_set_3_fastq_files
 
 
 # Download FASTA files for genome set 5
@@ -180,4 +179,4 @@ rule get_src_data:
 	input:
 		*rules.get_gambit_db.output,
 		*expand('resources/genomes/{gset}/fasta', gset=['set1', 'set2', 'set3', 'set4', 'set5']),
-		*rules.get_genome_set_3_fastq.output,
+	    # TODO - only the needed Set 3 FASTQ files
