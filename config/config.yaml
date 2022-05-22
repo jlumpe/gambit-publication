@@ -69,3 +69,6 @@ gambit_param_space:
 test_mode:
   # Truncate all genome sets to this size
   genome_cap: 20
+
+  # Truncate all leaf taxa in database to this many genomes
+  db_taxon_genomes_cap: 30

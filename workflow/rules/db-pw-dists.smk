@@ -8,6 +8,7 @@ checkpoint db_pw_dists_make_chunks:
 		db_genomes=rules.get_gambit_db.output['genomes'],
 	params:
 		max_chunk_size=2500,
+		taxon_genomes_cap=config['test_mode']['db_taxon_genomes_cap'] if TEST else None,
 	output:
 		summary_table='intermediate-data/db-pw-dists/chunks.csv',
 		taxa_table='intermediate-data/db-pw-dists/chunk-taxa.csv',
