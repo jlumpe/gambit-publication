@@ -111,34 +111,23 @@ rule figure_2:
 
 ### Figure 3 ###
 
-# Compare signatures derived from single FASTQ file to standard FASTA
-rule fastq_signatures:
+# Find k-mers in row FASTQ reads and compare to signature derived from assembly FASTA
+rule fastq_kmers:
 	input:
 		signatures=expand(rules.gambit_signatures.output, genomeset='set3', k=K, prefix=PREFIX)[0],
-		fastq_dir='resources/genomes/set3/fastq',
-	output:
-		'intermediate-data/fastq-signatures/{file}.csv'
+		fastq=rules.fetch_genome_set_3_fastq.output[0],
+	output: directory('intermediate-data/fastq-kmers/{genome}/')
 	params:
-		fasta_name='{file}.fasta',
-		fastq_name='{file}.fastq.gz',
+		fasta_name='{genome}.fasta',
+		genomes_table=get_genomes_table_file('set3'),
+		min_phred=[0, 10, 20, 30],
 	wildcard_constraints:
-		file=r'[\w-]+',
+		genome=r'[\w-]+',
 	script:
-		'../scripts/fastq-signatures.py'
-
-
-def get_fig3_input(wildcards):
-	with open(get_genomes_list_file('set3')) as f:
-		names = [line.split('.')[0] for line in f]
-
-	return expand(rules.fastq_signatures.output, file=names)
-
+		'../scripts/fastq-kmers.py'
 
 rule figure_3:
-	input:
-		get_fig3_input
-	output:
-		touch('results/figure-3/done')  # TODO
+	input: expand(rules.fastq_kmers.output, genome=config['figure_3']['genomes'])
 
 
 ### Figure 4 ###

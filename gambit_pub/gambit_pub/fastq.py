@@ -5,13 +5,6 @@ import numpy as np
 from gambit.kmers import find_kmers
 
 
-# Factor to convert exponent from PHRED (base 10^(1/10)) to natural (base e)
-PHRED_TO_NAT = -np.log(10) / 10
-
-def phredsum(q):
-	return np.logaddexp.reduce(np.asarray(q) * PHRED_TO_NAT) / PHRED_TO_NAT
-
-
 def get_phred(record):
 	return np.asarray(record.letter_annotations['phred_quality'])
 
@@ -19,17 +12,21 @@ def get_phred(record):
 class PhredAccumulator:
 	"""Accumulate k-mer counts binned by aggregated PHRED score."""
 
-	def __init__(self, bin_edges, dtype=np.dtype('u2')):
-		self.bin_edges = np.asarray(bin_edges)
-		self.nbins = len(self.bin_edges) + 1
+	def __init__(self, bins_left, dtype=np.dtype('u2')):
+		self.bins_left = np.asarray(bins_left)
+		assert np.all(np.diff(self.bins_left) > 0), 'Bins must be increasing'
+		self.nbins = len(self.bins_left)
 		self.dtype = dtype
 		self.dict = dict()
 
 	def get_bin(self, score):
-		return np.searchsorted(self.bin_edges, score, side='right')
+		return np.searchsorted(self.bins_left, score, side='right') - 1
 
 	def add(self, index, score):
+		"""Add k-mer by index and minimum PHRED score."""
 		b = self.get_bin(score)
+		if b < 0:  # Less than smallest bin
+			return
 
 		try:
 			arr = self.dict[index]
@@ -40,6 +37,7 @@ class PhredAccumulator:
 		assert arr[b] != 0  # catch overflow
 
 	def to_arrays(self):
+		"""Convert to array of found k-mer indices and array of counts."""
 		indices = np.fromiter(self.dict, dtype=int)
 		indices.sort()
 
@@ -50,16 +48,15 @@ class PhredAccumulator:
 		return indices, counts
 
 
-def accumulate_kmers_fastq(kspec, record, accumulators):
+def accumulate_kmers_fastq(kspec, record, accumulator):
+	"""Add k-mers in single FASTQ record to accumulator."""
 	phred = get_phred(record)
 
 	for match in find_kmers(kspec, record.seq):
 		try:
 			index = match.kmer_index()
 		except ValueError:
-			continue
+			continue  # Invalid nucleotide code, ignore
 
-		p = phred[match.full_indices()]
-
-		for agg_func, accum in accumulators:
-			accum.add(index, agg_func(p))
+		min_phred = np.min(phred[match.full_indices()])
+		accumulator.add(index, min_phred)

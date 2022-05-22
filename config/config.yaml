@@ -64,6 +64,11 @@ gambit_param_space:
     - ACTCTTG
 
 
+figure_3:
+  genomes:
+    - "19AC0011213"
+
+
 figure_4:
   subplots:
     a:
