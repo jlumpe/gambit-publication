@@ -141,6 +141,27 @@ rule figure_3:
 		touch('results/figure-3/done')  # TODO
 
 
+### Figure 4 ###
+
+# Generate one of figure 4's subplots
+# List of subplot parameters is in config file under figure_4/subplots
+rule figure_4_subplot:
+	input:
+		db_signatures=rules.get_gambit_db.output['signatures'],
+		db_genomes=rules.get_gambit_db.output['genomes'],
+	output: 'results/figure-4/figure-4{subplot}.png'
+	wildcard_constraints:
+		subplot='[a-z]'
+	threads: workflow.cores
+	params:
+		conf=lambda wildcards: config['figure_4']['subplots'][wildcards.subplot],
+	script: '../scripts/figure-4-subplot.py'
+
+# Generate all subplots of figure 4
+rule figure_4:
+	input: expand(rules.figure_4_subplot.output, subplot=list(config['figure_4']['subplots']))
+
+
 ### Figure 6 ###
 
 rule figure_6:

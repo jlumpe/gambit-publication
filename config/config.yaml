@@ -64,6 +64,18 @@ gambit_param_space:
     - ACTCTTG
 
 
+figure_4:
+  subplots:
+    a:
+      # Klebsiella pneumoniae vs Klebsiella variicola
+      in_taxon: 801
+      out_taxa: [803]
+    b:
+      # Neisseria gonorrhoeae vs Neisseria meningitidis
+      in_taxon: 869
+      out_taxa: [870]
+
+
 # Options for test mode
 # For test mode overrides to options already defined in this file, see config-test.yaml.
 test_mode:
