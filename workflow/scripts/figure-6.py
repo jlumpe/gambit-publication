@@ -24,6 +24,7 @@ plt.style.use('gambit')
 plt.rcParams.update({
     'image.cmap': 'Purples_r',
     'axes.labelsize': 10,
+    'axes.grid': False,
 })
 
 PHYLOGROUP_PALETTE = 'Set1'

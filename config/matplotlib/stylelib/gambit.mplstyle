@@ -3,5 +3,8 @@
 
 axes.labelsize: 14
 axes.labelpad: 10
-
 axes.titlesize: 16
+
+axes.grid: True
+
+axes.prop_cycle: cycler('color', ['1f77b4', '2ca02c', 'd62728', '9467bd', 'ff7f0e', '24b2a1'])
