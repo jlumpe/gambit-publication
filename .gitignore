@@ -1,6 +1,7 @@
 /env/
 /intermediate-data/
 /results/
+/resources/.test
 
 .snakemake/
 .ipynb_checkpoints/
