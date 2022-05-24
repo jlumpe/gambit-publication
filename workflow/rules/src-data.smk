@@ -174,6 +174,7 @@ rule get_genome_set_5:
 rule get_src_data:
 	input:
 		*rules.get_gambit_db.output,
-		*expand(rules.get_genome_set_1234.output, genomeset=['set1', 'set2', 'set3', 'set4']),
+		# *expand(rules.get_genome_set_1234.output, genomeset=['set1', 'set2', 'set3', 'set4']),
+		*expand(rules.get_genome_set_1234.output, genomeset=['set1', 'set2', 'set3']),
 		*rules.get_genome_set_5.output,
 		# TODO - only the needed Set 3 FASTQ files
