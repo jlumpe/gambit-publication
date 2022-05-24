@@ -35,6 +35,7 @@ jobs:
         shell: bash -l {0}
 
     env:
+      SNAKEMAKE_OPTS: "-p --show-failed-logs --config test=1"
       DATA_CACHE_PATHS: |
         resources/genomes/.download
         resources/genomes/set5/fasta
@@ -91,7 +92,7 @@ jobs:
           key: data-${{ runner.os }}--${{ runner.arch }}
 
       - name: Download source data
-        run: snakemake --cores 1 get_src_data --config test=1
+        run: snakemake --cores 1 get_src_data ${{ env.SNAKEMAKE_OPTS }}
         if: steps.restore-data.outputs.cache-hit != 'true' || github.event.input.invalidateDataCache
 
       - name: Save source data
@@ -104,4 +105,4 @@ jobs:
 
       - name: Run workflow
         run: |
-          snakemake -cores all --config test=1
+          snakemake -cores all ${{ env.SNAKEMAKE_OPTS }}
