@@ -24,10 +24,21 @@ from gambit.metric import jaccarddist_matrix, jaccarddist_pairwise
 
 plt.style.use('gambit')
 
+plt.rcParams.update({
+	'axes.grid.axis': 'x',
+})
+
 palette = plt.rcParams['axes.prop_cycle'].by_key()['color']
 
 FIGSIZE =  (12, 4)
-BINWIDTH = .01
+
+HISTOGRAM_STYLE = dict(
+	stat='percent',
+	element='step',
+	alpha=.2,
+	binwidth=.01,
+)
+THRESHOLD_LINE_STYLE = dict(lw=2, linestyle='dashed')
 
 
 ### Setup ###
@@ -70,8 +81,7 @@ intra_dists_flat = intra_dists[np.triu_indices(in_ngenomes, k=1)]
 mask = np.identity(in_ngenomes, dtype=bool)
 intra_masked = np.ma.masked_array(intra_dists, mask)
 
-# argmin_intra = np.argmin(intra_masked, axis=0)
-min_intra = np.min(intra_masked, axis=1)
+min_intra = np.min(intra_masked, axis=1).data
 
 min_inter = [np.min(dmat, axis=1) for dmat in inter_dists]
 
@@ -88,7 +98,6 @@ for mi in min_inter:
 
 fig = plt.figure(figsize=FIGSIZE)
 ax = plt.gca()
-ax.yaxis.set_visible(False)
 
 values = [intra_dists_flat, min_intra, *min_inter]
 labels = ['All intra-species', 'Minimum']
@@ -99,22 +108,18 @@ xmax = max(v.max() for v in values)
 for x, label, color in zip(values, labels, palette):
 	sns.histplot(
 		x=x,
-		element='step',
 		binrange=(0, xmax),
-		binwidth=BINWIDTH,
-		alpha=.3,
 		color=color,
-		stat='density',
 		label=label,
+		**HISTOGRAM_STYLE,
 	)
 
 # In taxon distance threshold
 ax.axvline(
 	in_thresh,
-	lw=2,
-	linestyle='dashed',
 	color=palette[0],
 	label='Threshold',
+	**THRESHOLD_LINE_STYLE,
 )
 
 
