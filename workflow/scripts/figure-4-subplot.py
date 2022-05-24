@@ -24,10 +24,6 @@ from gambit.metric import jaccarddist_matrix, jaccarddist_pairwise
 
 plt.style.use('gambit')
 
-plt.rcParams.update({
-	# 'axes.grid': True,
-})
-
 palette = plt.rcParams['axes.prop_cycle'].by_key()['color']
 
 FIGSIZE =  (12, 4)
@@ -90,7 +86,7 @@ for mi in min_inter:
 
 ### Plot ###
 
-fig = plt.figure(figsize=(12, 4))
+fig = plt.figure(figsize=FIGSIZE)
 ax = plt.gca()
 ax.yaxis.set_visible(False)
 
