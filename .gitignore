@@ -2,6 +2,7 @@
 /intermediate-data/
 /results/
 /resources/.test
+/extra/
 
 .snakemake/
 .ipynb_checkpoints/
