@@ -53,7 +53,7 @@ def gambit_ani_correlation_input(wildcards):
 # "paramspace" wildcard must be one of several predefined strings.
 rule gambit_ani_correlation:
 	params:
-	      params_df=gambit_paramspace,
+		params_df=gambit_paramspace,
 	input: gambit_ani_correlation_input,
 	output: 'results/gambit-ani-correlation/{paramspace}.csv'
 	script: '../scripts/gambit-vs-ani-correlation.py'
@@ -176,7 +176,6 @@ rule figure_5:
 	params:
 		conf=lambda wildcards: config['figure_5'],
 	script: '../scripts/figure-5.py'
-
 
 
 ### Figure 6 ###
