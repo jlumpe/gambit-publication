@@ -40,23 +40,13 @@ rule get_gambit_db:
 		'''
 
 
-def download_and_link(items, dl_path, link_path, nworkers, **kw):
-	"""Download list of files to a directory and create a symlink to that directory."""
-
-	from gambit_pub.download import download_parallel
-	from gambit_pub.utils import symlink_to_relative
-
-	dl_path = Path(dl_path)
-	dl_path.mkdir(parents=True, exist_ok=True)
-	download_parallel(items, dl_path, nworkers=nworkers, **kw)
-	symlink_to_relative(dl_path, link_path)
-
-
-def _get_genomeset(wc_or_gset):
+def _get_genomeset(wc_or_gset, require=False):
 	"""Get genome set ID string from argument."""
 	if isinstance(wc_or_gset, str):  # Given the ID itself
 		return wc_or_gset
 	elif wc_or_gset is None:  # None, return wildcard placeholder
+		if require:
+			raise TypeError('A value is required')
 		return '{genomeset}'
 	else:  # Assume wildcards object
 		return wc_or_gset.genomeset
@@ -72,6 +62,13 @@ def get_genomes_table_file(wildcards_or_genomeset, test=TEST):
 	gset = _get_genomeset(wildcards_or_genomeset)
 	parent_dir = RESOURCES_TEST_DIR if test else 'resources'
 	return f'{parent_dir}/genomes/{gset}/genomes.csv'
+
+def get_genomes_fasta_files(wildcards_or_genomeset, test=TEST, full_path=True):
+	"""Get paths of FASTA files for the given genome set (relative to root directory)."""
+	gset = _get_genomeset(wildcards_or_genomeset, require=True)
+	parent_dir = f'resources/genomes/{gset}/fasta/' if full_path else ''
+	list_file = get_genomes_list_file(gset, test=test)
+	return [os.path.join(parent_dir, filename) for filename in read_lines(list_file)]
 
 
 # Create truncated versions of genomes.txt when in test mode
@@ -89,53 +86,52 @@ rule truncated_genome_table:
 	input: get_genomes_table_file(None, test=False)
 	output: get_genomes_table_file(None, test=True)
 	params:
-	      nlines=config['test_mode']['genome_cap'] + 1,
+		nlines=config['test_mode']['genome_cap'] + 1,
 	shell:
 		"head -n {params[n]} {input} > {output}"
 
 
-# Download FASTA files for genome set 1 or 2 (both from NCBI FTP server)
-rule get_genome_set_12:
-	input: get_genomes_table_file
-	output: directory('resources/genomes/{genomeset}/fasta/')
+def _get_gset_12_dl_items(gset):
+	table = pd.read_csv(get_genomes_table_file(gset))
+	return [
+		(NCBI_FTP_PREFIX + row.ftp_path, row.assembly_accession + '.fa.gz', row.md5)
+		for _, row in table.iterrows()
+	]
+
+def _get_gset_34_dl_items(gset):
+	from gambit.util.io import read_lines
+
+	gs_dir = config['src_data']['genome_sets'][gset]['fasta'].rstrip('/')
+	prefix = GCS_PREFIX + gs_dir + '/'
+	list_file = get_genomes_list_file(gset)
+	return [(prefix + fname, fname, None) for fname in read_lines(list_file)]
+
+# Download FASTA files for genome sets 1-4
+rule get_genome_set_1234:
+	output: directory('resources/genomes/{genomeset}/fasta')
 	params:
 		dl_dir=f'{GENOMES_DL_DIR}/{{genomeset}}/fasta/',
 		nworkers=config['src_data']['nworkers'],
-		show_progress=config['show_progress'],  # Show progress bar
+		show_progress=config['show_progress'],
 	wildcard_constraints:
-		genomeset="set[12]",
+		genomeset="set[1234]",
 	run:
-		table = pd.read_csv(input[0])
-		items = [
-			(NCBI_FTP_PREFIX + row.ftp_path, row.assembly_accession + '.fa.gz', row.md5)
-			for _, row in table.iterrows()
-		]
-		download_and_link(items, params['dl_dir'], output[0], params['nworkers'],
-		                  progress=params['show_progress'], desc=f'{wildcards.genomeset} FASTA')
-
-
-# Download FASTA files for genome sets 3 and 4
-rule get_genome_set_34:
-	input:
-		get_genomes_list_file
-	output:
-		directory('resources/genomes/{genomeset}/fasta/')
-	params:
-		dl_dir=GENOMES_DL_DIR + '{genomeset}/fasta/',
-		nworkers=config['src_data']['nworkers'],
-		show_progress=config['show_progress'],  # Show progress bar
-	wildcard_constraints:
-		genomeset="set[34]",
-	run:
-		from gambit.util.io import read_lines
+		from gambit_pub.download import download_parallel
+		from gambit_pub.utils import symlink_to_relative
 
 		gset = wildcards.genomeset
-		gs_dir = config['src_data']['genome_sets'][gset]['fasta'].rstrip('/')
-		prefix = GCS_PREFIX + gs_dir + '/'
-		items = [(prefix + fname, fname, None) for fname in read_lines(input[0])]
 
-		download_and_link(items, params['dl_dir'], output[0], params['nworkers'],
-		                  progress=params['show_progress'], desc=f'{gset} FASTA')
+		if gset in ('set1', 'set2'):
+			items = _get_gset_12_dl_items(gset)
+		elif gset in ('set3', 'set4'):
+			items = _get_gset_34_dl_items(gset)
+		else:
+			raise ValueError(gset)
+
+		dl_path = Path(params['dl_dir'])
+		dl_path.mkdir(parents=True, exist_ok=True)
+		download_parallel(items, dl_path, nworkers=params['nworkers'], progress=params['show_progress'])
+		symlink_to_relative(dl_path, output[0])
 
 
 # Download FASTQ files for genome set 3
@@ -178,5 +174,6 @@ rule get_genome_set_5:
 rule get_src_data:
 	input:
 		*rules.get_gambit_db.output,
-		*expand('resources/genomes/{gset}/fasta', gset=['set1', 'set2', 'set3', 'set4', 'set5']),
-	    # TODO - only the needed Set 3 FASTQ files
+		*expand(rules.get_genome_set_1234.output, genomeset=['set1', 'set2', 'set3', 'set4']),
+		*rules.get_genome_set_5.output,
+		# TODO - only the needed Set 3 FASTQ files
