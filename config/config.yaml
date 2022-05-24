@@ -67,19 +67,27 @@ gambit_param_space:
 figure_4:
   subplots:
     a:
-      # Klebsiella pneumoniae vs Klebsiella variicola
+      # Klebsiella pneumoniae vs K. variicola
       in_taxon: 801
       out_taxa: [803]
     b:
-      # Neisseria gonorrhoeae vs Neisseria meningitidis
+      # Neisseria gonorrhoeae vs N. meningitidis
       in_taxon: 869
       out_taxa: [870]
 
 
 figure_5:
-  # Shigella boydii vs Shigella dysenteriae
-  in_taxon: 1909
-  out_taxa: [1910]
+  subplots:
+    # Shigella boydii vs S. dysenteriae
+    a:
+      in_taxon: 1909
+      out_taxa: [1910]
+      bin_width: 0.01
+    # Pseudomonas amygdali vs. P. savastanoi and P. syringae
+    b:
+      in_taxon: 655
+      out_taxa: [647, 634]
+      bin_width: 0.02
 
 
 # Options for test mode

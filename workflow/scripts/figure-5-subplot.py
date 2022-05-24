@@ -9,6 +9,7 @@ Expected Snakemake variables:
 	conf:
 		in_taxon: ID of "in" taxon. Must be divided into subgroups.
 		out_taxa: IDs of "out" taxa.
+		bin_width: Override default histogram bin width.
 * output: Figure png.
 """
 
@@ -19,6 +20,9 @@ import seaborn as sns
 from gambit.db import ReferenceDatabase, Taxon
 from gambit.metric import jaccarddist_matrix, jaccarddist_pairwise
 from gambit.util.misc import zip_strict
+
+
+conf = snakemake.params['conf']
 
 
 ### Plot style ###
@@ -32,7 +36,7 @@ plt.rcParams.update({
 palette = plt.rcParams['axes.prop_cycle'].by_key()['color']
 
 SUBPLOT_SIZE =  (12, 3)
-BINWIDTH = .01
+BINWIDTH = conf.get('bin_width', 0.01)
 
 INTRA_COLOR = palette[0]
 INTER_SG_COLOR = palette[1]
@@ -41,7 +45,7 @@ OUT_PALETTE = palette[2:]
 HISTOGRAM_STYLE = dict(
 	stat='percent',
 	element='step',
-	alpha=.3,
+	alpha=.1,
 )
 THRESHOLD_LINE_STYLE = dict(lw=2, linestyle='dashed')
 
@@ -50,7 +54,6 @@ THRESHOLD_LINE_STYLE = dict(lw=2, linestyle='dashed')
 
 refdb = ReferenceDatabase.load(snakemake.input['db_genomes'], snakemake.input['db_signatures'])
 
-conf = snakemake.params['conf']
 in_taxon = refdb.session.query(Taxon).get(conf['in_taxon'])
 out_taxa = [refdb.session.query(Taxon).get(tid) for tid in conf['out_taxa']]
 n_out = len(out_taxa)
@@ -146,7 +149,7 @@ histogram(axes[0], full_intra, INTRA_COLOR, label='Intra-species/subgroup')
 for taxon, dists, color in zip_strict(out_taxa, full_inter, out_colors):
 	histogram(axes[0], dists, color, label=f'Inter-species ({taxon.name})')
 
-axes[0].set_title('Combined')
+axes[0].set_title(in_taxon.name)
 
 
 # Remaining subplots - individual subgroups
