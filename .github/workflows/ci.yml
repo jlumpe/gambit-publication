@@ -2,74 +2,106 @@
 name: CI
 
 on:
-  push:
-  pull_request:
+#  push:
+#  pull_request:
+  # Only run when manually triggered
+  workflow_dispatch:
+    inputs:
+      gambitVersion:
+        description: "Tag or commit in GAMBIT repo to install from"
+        required: true
+        default: "master"
+      invalidateCondaCache:
+        description: "Invalidate cached Conda environment"
+        required: false
+        type: boolean
+      invalidateDataCache:
+        description: "Invalidate cached source data"
+        required: false
+        type: boolean
+
 
 jobs:
   test:
 
     runs-on: ubuntu-latest
+
     strategy:
       fail-fast: false
+
     defaults:
       run:
         # Need to run login shell to have conda environment initialized
         shell: bash -l {0}
 
+    env:
+      DATA_CACHE_PATHS: |
+        resources/genomes/.download
+        resources/genomes/set5/fasta
+        resources/gambit-db/db-genomes.db
+        resources/gambit-db/db-signatures.h5
+
     steps:
-    - uses: actions/checkout@v2
 
-    # The next 4 steps are taken from:
-    # https://github.com/marketplace/actions/setup-miniconda#caching-environments
+      - uses: actions/checkout@v2
 
-    - name: Setup Mambaforge
-      uses: conda-incubator/setup-miniconda@v2
-      with:
-        miniforge-variant: Mambaforge
-        miniforge-version: latest
-        activate-environment: gambit-pub
-        use-mamba: true
+      - name: Setup Mambaforge
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+          miniforge-variant: Mambaforge
+          miniforge-version: latest
+          activate-environment: gambit-pub
+          use-mamba: true
 
-    # Get current date to use as part of cache key in next step
-    - name: Get Date
-      id: get-date
-      run: echo "::set-output name=today::$(/bin/date -u '+%Y%m%d')"
-      shell: bash
+      - name: Restore Conda environment
+        id: restore-conda
+        uses: martijnhols/actions-cache/restore@v3
+        with:
+          path: ${{ env.CONDA }}/envs
+          key: conda-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('env.yaml') }}
 
-    - name: Cache Conda env
-      id: cache-env
-      uses: actions/cache@v2
-      with:
-        path: ${{ env.CONDA }}/envs
-        key: conda-${{ runner.os }}--${{ runner.arch }}--${{ steps.get-date.outputs.today }}-${{ hashFiles('env.yaml') }}-${{ env.CACHE_NUMBER }}
-      env:
-        # Increase this value to reset cache if etc/example-environment.yml has not changed
-        CACHE_NUMBER: 0
+      - name: Update Conda environment
+        run: |
+          mamba env update -n gambit-pub -f env.yaml
+          mamba install -n gambit-pub Cython gcc
+        if: steps.restore-conda.outputs.cache-hit != 'true' || github.event.input.invalidateCondaCache
 
-    - name: Update Conda environment
-      run: mamba env update -n gambit-pub -f env.yaml
-      if: steps.cache-env.outputs.cache-hit != 'true'
+      - name: Save conda environment
+        id: cache-conda
+        uses: martijnhols/actions-cache/save@v3
+        with:
+          path: ${{ env.CONDA }}/envs
+          key: ${{ steps.restore-conda.outputs.primary-key }}
+        if: steps.restore-conda.outputs.cache-hit != 'true' || github.event.input.invalidateCondaCache
 
-    # Environment setup done
+      # Environment setup done
 
-    - name: Cache source data
-      id: cache-data
-      uses: actions/cache@v2
-      with:
-        path: |
-          resources/genomes/.download
-          resources/genomes/set4/fasta
-#          resources/gambit-db/db-genomes.db
-#          resources/gambit-db/db-signatures.h5
-        key: conda-${{ runner.os }}--${{ runner.arch }}--${{ env.CACHE_NUMBER }}
-      env:
-        # Increment this manually every time things change
-        CACHE_NUMBER: 0
+      - name: Install GAMBIT
+        run: |
+          conda activate gambit-pub
+          pip install git+https://github.com/hesslab-gambit/gambit.git@$GAMBIT_VERSION
+        env:
+          GAMBIT_VERSION: ${{ github.event.inputs.gambitVersion }}
 
-    - name: Download source data
-      run: snakemake --cores all get_src_data --config test=true
-      if: steps.cache-data.outputs.cache-hit != 'true'
+      - name: Restore source data
+        id: restore-data
+        uses: martijnhols/actions-cache/restore@v3
+        with:
+          path: ${{ env.DATA_CACHE_PATHS }}
+          key: data-${{ runner.os }}--${{ runner.arch }}
 
-    - name: Run workflow
-      run: |
-        snakemake -c1 all --config test=true
+      - name: Download source data
+        run: snakemake --cores 1 get_src_data --config test=1
+        if: steps.restore-data.outputs.cache-hit != 'true' || github.event.input.invalidateDataCache
+
+      - name: Save source data
+        id: cache-data
+        uses: martijnhols/actions-cache/save@v3
+        with:
+          path: ${{ env.DATA_CACHE_PATHS }}
+          key: ${{ steps.restore-data.outputs.primary-key }}
+        if: steps.restore-data.outputs.cache-hit != 'true' || github.event.input.invalidateDataCache
+
+      - name: Run workflow
+        run: |
+          snakemake -cores all --config test=1
