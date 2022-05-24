@@ -26,7 +26,7 @@ GCS_PREFIX = 'https://storage.googleapis.com/'
 
 
 # Download GAMBIT database files
-rule get_gambit_db:
+rule fetch_gambit_db:
 	output:
 		genomes='resources/gambit-db/db-genomes.db',
 		signatures='resources/gambit-db/db-signatures.h5',
@@ -107,7 +107,7 @@ def _get_gset_34_dl_items(gset):
 	return [(prefix + fname, fname, None) for fname in read_lines(list_file)]
 
 # Download FASTA files for genome sets 1-4
-rule get_genome_set_1234:
+rule fetch_genome_set_1234:
 	output: directory('resources/genomes/{genomeset}/fasta')
 	params:
 		dl_dir=f'{GENOMES_DL_DIR}/{{genomeset}}/fasta/',
@@ -137,7 +137,7 @@ rule get_genome_set_1234:
 # Download FASTQ files for genome set 3
 # Unlike the FASTA download rules, this one operates on one FASTQ file at a time because they are
 # large and not every one is used.
-rule get_genome_set_3_fastq:
+rule fetch_genome_set_3_fastq:
 	output:
 		'resources/genomes/set3/fastq/{genome}.fastq.gz'
 	params:
@@ -149,16 +149,16 @@ rule get_genome_set_3_fastq:
 def get_genome_set_3_fastq_files(wildcards=None):
 	list_file = get_genomes_list_file('set3')
 	genomes = [file.rsplit('.', 1)[0] for file in read_lines(list_file)]
-	return expand(rules.get_genome_set_3_fastq.output, genome=genomes)
+	return expand(rules.fetch_genome_set_3_fastq.output, genome=genomes)
 
 # Download FASTQ files for all set 3 genomes
-# Not needed by main figures and tables and not included in get_src_data rule
-rule get_genome_set_3_fastq_all:
+# Not needed by main figures and tables and not included in fetch_src_data rule
+rule fetch_genome_set_3_fastq_all:
 	input: get_genome_set_3_fastq_files
 
 
 # Download FASTA files for genome set 5
-rule get_genome_set_5:
+rule fetch_genome_set_5:
 	output:
 		directory('resources/genomes/set5/fasta'),
 	params:
@@ -171,10 +171,10 @@ rule get_genome_set_5:
 
 
 # Download all source data
-rule get_src_data:
+rule fetch_src_data:
 	input:
-		*rules.get_gambit_db.output,
-		# *expand(rules.get_genome_set_1234.output, genomeset=['set1', 'set2', 'set3', 'set4']),
-		*expand(rules.get_genome_set_1234.output, genomeset=['set1', 'set2', 'set3']),
-		*rules.get_genome_set_5.output,
+		*rules.fetch_gambit_db.output,
+		# *expand(rules.fetch_genome_set_1234.output, genomeset=['set1', 'set2', 'set3', 'set4']),
+		*expand(rules.fetch_genome_set_1234.output, genomeset=['set1', 'set2', 'set3']),
+		*rules.fetch_genome_set_5.output,
 		# TODO - only the needed Set 3 FASTQ files

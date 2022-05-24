@@ -4,8 +4,8 @@
 # Divide reference genomes into chunks based on taxonomy
 checkpoint db_pw_dists_make_chunks:
 	input:
-		db_signatures=rules.get_gambit_db.output['signatures'],
-		db_genomes=rules.get_gambit_db.output['genomes'],
+		db_signatures=rules.fetch_gambit_db.output['signatures'],
+		db_genomes=rules.fetch_gambit_db.output['genomes'],
 	params:
 		max_chunk_size=2500,
 		taxon_genomes_cap=config['test_mode']['db_taxon_genomes_cap'] if TEST else None,
@@ -19,7 +19,7 @@ checkpoint db_pw_dists_make_chunks:
 # Create pairwise distance matrix for two chunks
 rule db_pw_dists_chunk:
 	input:
-		signatures=rules.get_gambit_db.output['signatures'],
+		signatures=rules.fetch_gambit_db.output['signatures'],
 		chunks_dir=rules.db_pw_dists_make_chunks.output['chunks_dir'],
 	output: 'intermediate-data/db-pw-dists/dists/{chunk1}-{chunk2}.h5'
 	wildcard_constraints:
@@ -59,7 +59,7 @@ def get_db_pw_dists_dmat_chunks(wildcards=None):
 # Minimum and maximum distances between leaf taxa
 rule db_taxa_pw_dist_ranges:
 	input:
-		db_genomes=rules.get_gambit_db.output['genomes'],
+		db_genomes=rules.fetch_gambit_db.output['genomes'],
 		genome_chunks=get_db_pw_dists_genome_chunks,
 		dmat_chunks=get_db_pw_dists_dmat_chunks,
 	output:

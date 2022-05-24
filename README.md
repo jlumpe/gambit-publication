@@ -61,7 +61,7 @@ from the project's root directory. This must be done with each new shell session
 ### Download source data
 
 Large files in `resources/` are not present in version control and need to be downloaded separately.
-You can do this all up front by running the `get_src_data` target. Otherwise the individual data
+You can do this all up front by running the `fetch_src_data` target. Otherwise the individual data
 sets will be downloaded as needed when running the workflow.
 
 

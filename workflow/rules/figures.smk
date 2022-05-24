@@ -147,8 +147,8 @@ rule figure_3:
 # List of subplot parameters is in config file under figure_4/subplots
 rule figure_4_subplot:
 	input:
-		db_signatures=rules.get_gambit_db.output['signatures'],
-		db_genomes=rules.get_gambit_db.output['genomes'],
+		db_signatures=rules.fetch_gambit_db.output['signatures'],
+		db_genomes=rules.fetch_gambit_db.output['genomes'],
 	output: 'results/figure-4/figure-4{subplot}.png'
 	wildcard_constraints:
 		subplot='[a-z]'
@@ -168,8 +168,8 @@ rule figure_4:
 # List of subplot parameters is in config file under figure_5/subplots
 rule figure_5_subplot:
 	input:
-		db_signatures=rules.get_gambit_db.output['signatures'],
-		db_genomes=rules.get_gambit_db.output['genomes'],
+		db_signatures=rules.fetch_gambit_db.output['signatures'],
+		db_genomes=rules.fetch_gambit_db.output['genomes'],
 	output: 'results/figure-5/figure-5{subplot}.png'
 	wildcard_constraints:
 		subplot='[a-z]'

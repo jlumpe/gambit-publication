@@ -92,7 +92,7 @@ jobs:
           key: data-${{ runner.os }}--${{ runner.arch }}
 
       - name: Download source data
-        run: snakemake --cores 1 get_src_data ${{ env.SNAKEMAKE_OPTS }}
+        run: snakemake --cores 1 fetch_src_data ${{ env.SNAKEMAKE_OPTS }}
         if: steps.restore-data.outputs.cache-hit != 'true' || github.event.input.invalidateDataCache
 
       - name: Save source data
