@@ -162,6 +162,23 @@ rule figure_4:
 	input: expand(rules.figure_4_subplot.output, subplot=list(config['figure_4']['subplots']))
 
 
+### Figure 5 ###
+
+# Generate figure 5
+rule figure_5:
+	input:
+		db_signatures=rules.get_gambit_db.output['signatures'],
+		db_genomes=rules.get_gambit_db.output['genomes'],
+	output: 'results/figure-5/figure-5.png'
+	wildcard_constraints:
+		subplot='[a-z]'
+	threads: workflow.cores
+	params:
+		conf=lambda wildcards: config['figure_5'],
+	script: '../scripts/figure-5.py'
+
+
+
 ### Figure 6 ###
 
 rule figure_6:

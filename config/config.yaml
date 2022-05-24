@@ -76,6 +76,12 @@ figure_4:
       out_taxa: [870]
 
 
+figure_5:
+  # Shigella boydii vs Shigella dysenteriae
+  in_taxon: 1909
+  out_taxa: [1910]
+
+
 # Options for test mode
 # For test mode overrides to options already defined in this file, see config-test.yaml.
 test_mode:
