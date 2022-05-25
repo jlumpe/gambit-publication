@@ -9,7 +9,7 @@ from gambit.util.io import read_lines, write_lines
 min_version("7.0")
 
 wildcard_constraints:
-	genomeset="set[1234]",
+	genomeset="set[12345]",
 	k="\d+",
 	prefix="[ACGT]+",
 

@@ -73,22 +73,22 @@ def get_genomes_fasta_files(wildcards_or_genomeset, test=TEST, full_path=True):
 
 # Create truncated versions of genomes.txt when in test mode
 rule truncated_genome_list:
-	input: get_genomes_list_file(None, test=False)
 	output: get_genomes_list_file(None, test=True)
 	params:
-		nlines=config['test_mode']['genome_cap'],
+		src=get_genomes_list_file(None, test=False),
+		n=config['test_mode']['genome_cap'],
 	shell:
-		"head -n {params[n]} {input} > {output}"
+		"head -n {params[n]} {params[src]} > {output}"
 
 
 # Create truncated versions of genomes.csv when in test mode
 rule truncated_genome_table:
-	input: get_genomes_table_file(None, test=False)
 	output: get_genomes_table_file(None, test=True)
 	params:
-		nlines=config['test_mode']['genome_cap'] + 1,
+		src=get_genomes_table_file(None,test=False),
+		n=config['test_mode']['genome_cap'] + 1,
 	shell:
-		"head -n {params[n]} {input} > {output}"
+		"head -n {params[n]} {params[src]} > {output}"
 
 
 def _get_gset_12_dl_items(gset):
