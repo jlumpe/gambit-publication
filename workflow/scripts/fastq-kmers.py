@@ -79,6 +79,8 @@ stats = dict(
     nreads=nreads,
     total_length=total_len,
     estimated_coverage=total_len / fasta_stats.loc['total_length'],
+    fasta_length=fasta_stats.loc['total_length'],
+    fasta_nkmers=len(fasta_sig),
 )
 
 

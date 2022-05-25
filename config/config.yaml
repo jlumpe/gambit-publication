@@ -66,7 +66,12 @@ gambit_param_space:
 
 figure_3:
   genomes:
-    - "19AC0011213"
+    # Chosen to be around the median precision/recall of all genomes
+    - "16AC1611141-CAP"
+    - "18AC0012153M"
+    - "18AC0017658"
+    - "19AC0011211-2"
+    - "17AC0006312"
 
 
 figure_4:

@@ -40,3 +40,13 @@ rule set_34_genomes_csv:
 		results.index = pd.Series(real_ids, name='id')
 
 		results.to_csv(output[0])
+
+
+def get_fastq_kmers_all_input(wildcards=None):
+	from gambit_pub.utils import stripext
+	genomes = list(map(stripext, get_genomes_fasta_files('set3', full_path=False)))
+	return expand(rules.fastq_kmers.output, genome=genomes)
+
+# Run the fastq_kmers rule for all genomes in set 3
+rule fastq_kmers_all:
+	input: get_fastq_kmers_all_input

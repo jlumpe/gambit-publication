@@ -128,6 +128,11 @@ rule fastq_kmers:
 
 rule figure_3:
 	input: expand(rules.fastq_kmers.output, genome=config['figure_3']['genomes'])
+	output: 'results/figure-3/figure-3.png'
+	params:
+		genomes=config['figure_3']['genomes'],
+		min_phred=20,
+	script: '../scripts/figure-3.py'
 
 
 ### Figure 4 ###
