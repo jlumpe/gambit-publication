@@ -4,9 +4,6 @@ from pathlib import Path
 import os
 import re
 
-import numpy as np
-import pandas as pd
-
 
 def symlink_to_relative(dst, src, is_dir=False):
     """Create a symlink frm src to dst, where both paths are relative to the same directory.
@@ -24,8 +21,3 @@ def genome_set_label(gset):
     m = re.fullmatch(r'set(\d)', gset)
     assert m is not None
     return 'Set ' + m.group(1)
-
-
-def fix_nullable_int_col(values):
-    """Fix column containing ints/Nones after Pandas coerces it to float data type."""
-    return np.asarray([None if pd.isnull(v) else int(v) for v in values], dtype=object)

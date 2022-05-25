@@ -20,7 +20,6 @@ from pathlib import Path
 import pandas as pd
 
 from gambit.db import ReferenceDatabase
-from gambit_pub.utils import fix_nullable_int_col
 
 
 ### Setup ###
@@ -43,7 +42,7 @@ for taxon in refdb.genomeset.root_taxa():
 
 taxa_df = pd.DataFrame(taxa_rows, columns=['db_id', 'ncbi_id', 'name', 'ngenomes'])
 taxa_df.set_index('db_id', inplace=True)
-taxa_df['ncbi_id'] = fix_nullable_int_col(taxa_df['ncbi_id'])
+taxa_df['ncbi_id'] = taxa_df['ncbi_id'].astype(pd.Int64Dtype())
 
 
 ### Assign top-level taxa to chunks ###

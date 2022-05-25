@@ -14,8 +14,8 @@ import numpy as np
 import pandas as pd
 import h5py as h5
 
-from gambit.db.models import Taxon, only_genomeset
-from gambit.db.sqla import file_sessionmaker
+from gambit.db import Taxon, load_genomeset
+from gambit_pub.db_pw_dists import GenomeChunks, map_dmat_chunk_files
 
 
 ### Code ###
@@ -32,32 +32,19 @@ def indices_to_slice(indices):
 
 # Get leaf genomes
 
-Session = file_sessionmaker(snakemake.input['db_genomes'])
-session = Session()
-gset = only_genomeset(session)
+session, gset = load_genomeset(snakemake.input['db_genomes'])
 
 leaf_ids = sorted(taxon.id for taxon in gset.taxa.filter(~Taxon.children.any()))
 nleaves = len(leaf_ids)
 leaf_id_to_index = {id: i for i, id in enumerate(leaf_ids)}
 
+
 # Genome chunks
 
-chunk_genomes = [pd.read_csv(f) for f in snakemake.input['genome_chunks']]
-nchunks = len(chunk_genomes)
+chunks = GenomeChunks.load(snakemake.input['chunk_taxa'], snakemake.input['chunk_genomes_dir'])
 
-chunk_pairs = [(i, j) for i in range(nchunks) for j in range(i, nchunks)]
-
-# Distance matrix chunks
-
-dmat_files = dict()
-
-for file in snakemake.input['dmat_chunks']:
-	m = re.search(r'(\d+)-(\d+).h5$', file)
-	i = int(m.group(1))
-	j = int(m.group(2))
-	dmat_files[i, j] = file
-
-assert set(chunk_pairs) == dmat_files.keys()
+dmat_files = map_dmat_chunk_files(snakemake.input['dmat_chunks'])
+assert dmat_files.keys() == set(chunks.pairs)
 
 
 ### Aggregate ###
@@ -65,9 +52,10 @@ assert set(chunk_pairs) == dmat_files.keys()
 min_dists = np.full((nleaves, nleaves), np.inf, dtype=np.float32)
 max_dists = np.full((nleaves, nleaves), -1, dtype=np.float32)
 
-for c1, c2 in chunk_pairs:
-	gb1 = chunk_genomes[c1].groupby('taxon_id')
-	gb2 = chunk_genomes[c2].groupby('taxon_id')
+from tqdm import tqdm
+for c1, c2 in tqdm(chunks.pairs):
+	gb1 = chunks.genome_dfs[c1].groupby('taxon_id')
+	gb2 = chunks.genome_dfs[c2].groupby('taxon_id')
 
 	with h5.File(dmat_files[c1, c2]) as file:
 		dmat = file['dmat'][:]
@@ -87,8 +75,10 @@ for c1, c2 in chunk_pairs:
 
 ### Write output ###
 
-min_df = pd.DataFrame(min_dists, index=leaf_ids, columns=leaf_ids)
+minmax_index = pd.Series(leaf_ids, name='taxon_id')
+
+min_df = pd.DataFrame(min_dists, index=minmax_index, columns=leaf_ids)
 min_df.to_csv(snakemake.output['min_dists'])
 
-max_df = pd.DataFrame(max_dists, index=leaf_ids, columns=leaf_ids)
+max_df = pd.DataFrame(max_dists, index=minmax_index, columns=leaf_ids)
 max_df.to_csv(snakemake.output['max_dists'])
