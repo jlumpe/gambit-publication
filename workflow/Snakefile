@@ -48,7 +48,6 @@ COMPARISON_GENOME_SETS = ['set1', 'set2', 'set3']
 include: "rules/src-data.smk"
 include: "rules/fastani.smk"
 include: "rules/gambit.smk"
-include: "rules/db-pw-dists.smk"
 include: "rules/figures.smk"
 include: "rules/supplemental.smk"
 include: "rules/extra.smk"
