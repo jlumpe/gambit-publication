@@ -1,4 +1,4 @@
-"""Create figure 5.
+"""Create on of the figure 5 subplots.
 
 Expected Snakemake variables:
 
@@ -155,6 +155,7 @@ axes[0].set_title(in_taxon.name)
 # Remaining subplots - individual subgroups
 for i, ax in enumerate(axes[1:]):
 	ax.set_title(f'Subgroup {i+1} (n={sg_sizes[i]})')
+	ax.set_axisbelow(True)
 
 	# Subgroup intra/inter
 	histogram(ax, subgroup_intra[i], INTRA_COLOR)

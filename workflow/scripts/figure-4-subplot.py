@@ -38,7 +38,7 @@ HISTOGRAM_STYLE = dict(
 	alpha=.2,
 	binwidth=.01,
 )
-THRESHOLD_LINE_STYLE = dict(lw=2, linestyle='dashed')
+THRESHOLD_LINE_STYLE = dict(lw=1, linestyle='dashed')
 
 
 ### Setup ###
@@ -126,6 +126,7 @@ ax.axvline(
 # Finish up
 ax.set_title(in_taxon.name)
 ax.set_xlabel('GAMBIT Distance')
+ax.set_axisbelow(True)
 plt.tight_layout()
 ax.legend(
 	ncol=len(labels) + 1,

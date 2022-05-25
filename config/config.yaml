@@ -93,10 +93,10 @@ figure_5:
       in_taxon: 1909
       out_taxa: [1910]
       bin_width: 0.01
-    # Pseudomonas amygdali vs. P. savastanoi and P. syringae
+    # Pseudomonas amygdali vs. P. syringae and P. savastanoi
     b:
       in_taxon: 655
-      out_taxa: [647, 634]
+      out_taxa: [634, 647]
       bin_width: 0.02
 
 
