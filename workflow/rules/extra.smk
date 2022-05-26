@@ -9,7 +9,7 @@ rule genome_set_quast:
 	output: directory('extra/quast/{genomeset}')
 	threads: workflow.cores
 	params:
-		files=get_genomes_fasta_files,
+		files=get_genome_fasta_files,
 	shell:
 		"""
 		quast --fast --silent -o {output} -t {threads} {params[files]}
@@ -24,7 +24,8 @@ rule set_34_genomes_csv:
 	wildcard_constraints:
 		genomeset='set[34]',
 	params:
-		filenames=lambda wc: get_genomes_fasta_files(wc, full_path=False),
+		filenames=lambda wc: get_genome_fasta_files(wc, full_path=False),
+		output='resources/genomes/{genomeset}/genomes.csv',
 	run:
 		results = pd.read_csv(os.path.join(input[0], 'transposed_report.tsv'), sep='\t')
 
@@ -44,7 +45,7 @@ rule set_34_genomes_csv:
 
 def get_fastq_kmers_all_input(wildcards=None):
 	from gambit_pub.utils import stripext
-	genomes = list(map(stripext, get_genomes_fasta_files('set3', full_path=False)))
+	genomes = list(map(stripext, get_genome_fasta_files('set3', full_path=False)))
 	return expand(rules.fastq_kmers.output, genome=genomes)
 
 # Run the fastq_kmers rule for all genomes in set 3

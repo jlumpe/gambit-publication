@@ -22,3 +22,7 @@ def genome_set_label(gset):
     assert m is not None
     return 'Set ' + m.group(1)
 
+
+def stripext(filename):
+    """Remove the extension(s) from a file name."""
+    return filename.split('.', 1)[0]
