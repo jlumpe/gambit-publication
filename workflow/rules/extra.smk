@@ -16,11 +16,13 @@ rule genome_set_quast:
 		"""
 
 
-# Generate genomes.csv for genome sets 3 and 4
-# These are added to version control so it's not necessary to run normally
+# Generate genomes.csv for genome sets 3 and 4.
+# These are added to version control so it's not necessary to run normally.
+# Also don't actually set the output to replace the original file, we don't this rule to be run
+# automatically when regular rules need the table.
 rule set_34_genomes_csv:
 	input: rules.genome_set_quast.output
-	output: 'resources/genomes/{genomeset}/genomes.csv'
+	output: 'extra/genomes-csv/{genomeset}-genomes.csv'
 	wildcard_constraints:
 		genomeset='set[34]',
 	params:
