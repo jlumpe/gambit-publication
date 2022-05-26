@@ -5,10 +5,11 @@ Expected Snakemake variables:
 * input
   * signatures: Signature file derived from FASTA files.
   * fastq: FASTQ file.
+  * genomes_table: CSV file of genome/assembly data.
 * params
   * fasta_name: Name of FASTA file to look up the correct signature.
-  * genomes_table: CSV file of genome/assembly data.
   * min_phred: Minimum PHRED scores to filter reads by.
+  * truncate_reads: Only process this many reads (speed up this rule for testing).
 * output: Directory with the following files:
   * kmer-counts.csv: CSV file of counts for each k-mer found in FASTQ file.
   * stats.json: Additional statistics.
@@ -25,9 +26,11 @@ from gambit.seq import SequenceFile
 from gambit_pub.fastq import PhredAccumulator, accumulate_kmers_fastq
 
 
+TRUNCATE_READS = snakemake.params['truncate_reads']
+
 ### Get FASTA file stats ###
 
-fasta_df = pd.read_csv(snakemake.params['genomes_table'], index_col=0)
+fasta_df = pd.read_csv(snakemake.input['genomes_table'], index_col=0)
 fasta_stats = fasta_df.loc[snakemake.wildcards['genome']]
 
 
@@ -57,6 +60,9 @@ for record in seqfile.parse():
     total_len += len(record.seq)
     accumulate_kmers_fastq(kmerspec, record, accumulator)
 
+    if TRUNCATE_READS is not None and nreads >= TRUNCATE_READS:
+        break
+
 
 ### Counts table ###
 
@@ -75,12 +81,14 @@ counts_df.insert(0, 'in_fasta', np.in1d(indices, fasta_sig))
 
 ### Additional statistics ###
 
+assembly_len = int(fasta_stats.loc['total_length'])
+
 stats = dict(
     nreads=nreads,
     total_length=total_len,
-    estimated_coverage=total_len / fasta_stats.loc['total_length'],
-    fasta_length=fasta_stats.loc['total_length'],
-    fasta_nkmers=len(fasta_sig),
+    estimated_coverage=total_len / assembly_len,
+    assembly_length=assembly_len,
+    assembly_nkmers=len(fasta_sig),
 )
 
 

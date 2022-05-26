@@ -111,26 +111,40 @@ rule figure_2:
 
 ### Figure 3 ###
 
-# Find k-mers in row FASTQ reads and compare to signature derived from assembly FASTA
+# Find k-mers in set3 FASTQ reads and compare to signatures derived from assembly FASTA
 rule fastq_kmers:
 	input:
 		signatures=expand(rules.gambit_signatures.output, genomeset='set3', k=K, prefix=PREFIX)[0],
 		fastq=rules.fetch_genome_set_3_fastq.output[0],
+		genomes_table=get_genomes_table_file('set3'),
 	output: directory('intermediate-data/fastq-kmers/{genome}/')
 	params:
 		fasta_name='{genome}.fasta',
-		genomes_table=get_genomes_table_file('set3'),
 		min_phred=[0, 10, 20, 30],
+		truncate_reads=100_000 if TEST else None,
 	wildcard_constraints:
 		genome=r'[\w-]+',
 	script:
 		'../scripts/fastq-kmers.py'
 
+
+def get_figure_3_genomes(wildcards=None):
+	from gambit_pub.utils import stripext
+
+	if TEST:
+		fasta_files = get_genome_fasta_files('set3', test=True, full_path=False)
+		return [stripext(f) for f in fasta_files[:2]]
+	else:
+		return config['figure_3']['genomes']
+
+def get_figure_3_input(wildcards=None):
+	return expand(rules.fastq_kmers.output, genome=get_figure_3_genomes())
+
 rule figure_3:
-	input: expand(rules.fastq_kmers.output, genome=config['figure_3']['genomes'])
+	input: get_figure_3_input
 	output: 'results/figure-3/figure-3.png'
 	params:
-		genomes=config['figure_3']['genomes'],
+		genomes=get_figure_3_genomes,
 		min_phred=20,
 	script: '../scripts/figure-3.py'
 
