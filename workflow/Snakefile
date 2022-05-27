@@ -59,8 +59,11 @@ rule main:
 		*rules.figure_1.output,
 		*rules.figure_2.output,
 		*rules.figure_3.output,
+		*rules.figure_4.output,
+		*rules.figure_5.output,
 		*rules.figure_6.output,
 	default_target: True
+
 
 # Create supplemental figures and tables.
 rule supplemental:
