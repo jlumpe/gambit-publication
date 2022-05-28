@@ -13,25 +13,30 @@ wildcard_constraints:
 	k="\d+",
 	prefix="[ACGT]+",
 
+# Path to this repo's base directory, regardless of the work directory we're running Snakemake in
+SRC_DIR = os.path.realpath(os.path.dirname(workflow.basedir))
 
-### Configuration ###
 
-configfile: "config/config.yaml"
+### Test mode ###
 
-# Running in test mode?
 # Note - can't set config value to a bool from the command line, just check for truthiness
 TEST = bool(config.get('test', False))
 
 if TEST:
 	print("Test mode enabled!")
-	# Override default config file with values in test file
-	configfile: "config/config-test.yaml"
+
+
+### Configuration ###
+
+configfile: f'{SRC_DIR}/config/config.yaml'
+if TEST:
+	configfile: f'{SRC_DIR}/config/config-test.yaml'
 
 # Environment
 os.environ.update(
-	GAMBIT_DB_PATH="resources/gambit-db",
-	MPLCONFIGDIR=os.path.abspath('config/matplotlib'),
-	MATPLOTLIBRC=os.path.abspath('config/matplotlib/matplotlibrc'),
+	GAMBIT_DB_PATH=f'{SRC_DIR}/resources/gambit-db',
+	MPLCONFIGDIR=f'{SRC_DIR}/config/matplotlib',
+	MATPLOTLIBRC=f'{SRC_DIR}/config/matplotlib/matplotlibrc',
 )
 
 # Main GAMBIT parameters
