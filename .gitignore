@@ -3,6 +3,7 @@
 /results/
 /resources/.test
 /extra/
+/test-workdir/
 
 .snakemake/
 .ipynb_checkpoints/
