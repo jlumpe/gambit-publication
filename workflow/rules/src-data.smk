@@ -183,7 +183,6 @@ rule fetch_genome_set_5:
 rule fetch_src_data:
 	input:
 		*rules.fetch_gambit_db.output,
-		# *map(get_genomes_fasta_dir, ['set1', 'set2', 'set3', 'set4', 'set5']),
-		*map(get_genomes_fasta_dir, ['set1', 'set2', 'set3', 'set5']),
+		*map(get_genomes_fasta_dir, ['set1', 'set2', 'set3', 'set4', 'set5']),
 		*rules.fetch_genome_set_5.output,
 		# TODO - only the needed Set 3 FASTQ files
