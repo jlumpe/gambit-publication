@@ -32,6 +32,9 @@ configfile: f'{SRC_DIR}/config/config.yaml'
 if TEST:
 	configfile: f'{SRC_DIR}/config/config-test.yaml'
 
+# Directory source data is downloaded to
+DL_RESOURCES = f'{SRC_DIR}/resources' if config['dl_to_src_dir'] else 'resources'
+
 # Environment
 os.environ.update(
 	GAMBIT_DB_PATH=f'{SRC_DIR}/resources/gambit-db',
@@ -55,6 +58,9 @@ include: "rules/gambit.smk"
 include: "rules/figures.smk"
 include: "rules/supplemental.smk"
 include: "rules/extra.smk"
+
+if TEST:
+	include: "rules/test.smk"
 
 
 # Create primary figures and tables.

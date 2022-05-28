@@ -11,11 +11,8 @@ used instead of Snakemake's built-in "threads" variable because the download thr
 instead of cpu-bound.
 """
 
-# Store variations of resource files here for use in test mode
-RESOURCES_TEST_DIR = 'resources/.test'
-
 # Actually download genomes to this directory
-GENOMES_DL_DIR = 'resources/genomes/.download'
+GENOMES_DL_DIR = f'{DL_RESOURCES}/genomes/.download'
 
 # URL prefix for NCBI files
 _ncbi_protocol = 'http' if config['ncbi_use_http'] else 'ftp'
@@ -28,8 +25,8 @@ GCS_PREFIX = 'https://storage.googleapis.com/'
 # Download GAMBIT database files
 rule fetch_gambit_db:
 	output:
-		genomes='resources/gambit-db/db-genomes.db',
-		signatures='resources/gambit-db/db-signatures.h5',
+		genomes=f'{DL_RESOURCES}/gambit-db/db-genomes.db',
+		signatures=f'{DL_RESOURCES}/gambit-db/db-signatures.h5',
 	params:
 		genomes_url=GCS_PREFIX + config['src_data']['gambit_db']['genomes'],
 		signatures_url=GCS_PREFIX + config['src_data']['gambit_db']['signatures'],
@@ -52,51 +49,36 @@ def _get_genomeset(wc_or_gset, require=False):
 		return wc_or_gset.genomeset
 
 def get_genomes_list_file(wildcards_or_genomeset, test=TEST):
-	"""Get the genomes.txt file for given genome set, using reduced version in test mode."""
+	"""Get the genomes.txt file for given genome set, using truncated version in test mode."""
 	gset = _get_genomeset(wildcards_or_genomeset)
-	parent_dir = RESOURCES_TEST_DIR if test else 'resources'
-	return f'{parent_dir}/genomes/{gset}/genomes.txt'
+	parent_dir = 'intermediate-data/test/genomes' if test else f'{SRC_DIR}/resources/genomes'
+	return f'{parent_dir}/{gset}/genomes.txt'
 
 def get_genomes_table_file(wildcards_or_genomeset, test=TEST):
-	"""Get the genomes.txt file for given genome set, using reduced version in test mode."""
+	"""Get the genomes.csv file for given genome set, using truncated version in test mode."""
 	gset = _get_genomeset(wildcards_or_genomeset)
-	parent_dir = RESOURCES_TEST_DIR if test else 'resources'
-	return f'{parent_dir}/genomes/{gset}/genomes.csv'
+	parent_dir = 'intermediate-data/test/genomes' if test else f'{SRC_DIR}/resources/genomes'
+	return f'{parent_dir}/{gset}/genomes.csv'
 
 def get_genomes_fasta_dir(wildcards_or_genomeset):
 	gset = _get_genomeset(wildcards_or_genomeset)
-	return f'resources/genomes/{gset}/fasta/'
+	return f'{DL_RESOURCES}/genomes/{gset}/fasta/'
 
 def get_genome_fasta_files(wildcards_or_genomeset, test=TEST, full_path=True):
 	"""Get paths of FASTA files for the given genome set (relative to root directory)."""
 	gset = _get_genomeset(wildcards_or_genomeset, require=True)
+
+	# Ensure we've created the truncated version of this file
+	if test:
+		checkpoints.truncated_genome_list.get(genomeset=gset)
+
 	parent_dir = get_genomes_fasta_dir(gset) if full_path else ''
-	list_file = get_genomes_list_file(gset, test=test)
-	return [os.path.join(parent_dir, filename) for filename in read_lines(list_file)]
+	filenames = read_lines(get_genomes_list_file(gset, test=test))
+	return [os.path.join(parent_dir, fname) for fname in filenames]
 
 
-# Create truncated versions of genomes.txt when in test mode
-rule truncated_genome_list:
-	output: get_genomes_list_file(None, test=True)
-	params:
-		src=get_genomes_list_file(None, test=False),
-		n=config['test_genome_cap'],
-	shell:
-		"head -n {params[n]} {params[src]} > {output}"
-
-
-# Create truncated versions of genomes.csv when in test mode
-rule truncated_genome_table:
-	output: get_genomes_table_file(None, test=True)
-	params:
-		src=get_genomes_table_file(None, test=False),
-		n=config['test_genome_cap'] + 1,
-	shell:
-		"head -n {params[n]} {params[src]} > {output}"
-
-
-# Download individual FASTA
 def fetch_genome_fasta_files(items, dl_dir, out_dir, nworkers, show_progress):
+	"""Download FASTA files to dl_dir, then link out_dir to dl_dir."""
 	from gambit_pub.download import download_parallel
 	from gambit_pub.utils import symlink_to_relative
 
@@ -106,11 +88,12 @@ def fetch_genome_fasta_files(items, dl_dir, out_dir, nworkers, show_progress):
 	symlink_to_relative(dl_dir, out_dir)
 
 
+# Get genomes from sets 1 and 2, from NCBI FTP server
 rule fetch_genome_set_12:
 	input: get_genomes_table_file
-	output: directory('resources/genomes/{genomeset}/fasta')
+	output: directory(f'{DL_RESOURCES}/genomes/{{genomeset}}/fasta')
 	params:
-		dl_dir=f'{GENOMES_DL_DIR}/{{genomeset}}/fasta/',
+		dl_dir=f'{GENOMES_DL_DIR}/{{genomeset}}',
 		nworkers=config['dl_nworkers'],
 		show_progress=config['show_progress'],
 	wildcard_constraints:
@@ -124,11 +107,12 @@ rule fetch_genome_set_12:
 		fetch_genome_fasta_files(items, params['dl_dir'], output[0], params['nworkers'], params['show_progress'])
 
 
+# Get genomes from sets 3 and 4, urls from config file
 rule fetch_genome_set_34:
 	input: get_genomes_list_file
-	output: directory('resources/genomes/{genomeset}/fasta')
+	output: directory(f'{DL_RESOURCES}/genomes/{{genomeset}}/fasta')
 	params:
-		dl_dir=f'{GENOMES_DL_DIR}/{{genomeset}}/fasta/',
+		dl_dir=f'{GENOMES_DL_DIR}/{{genomeset}}',
 		nworkers=config['dl_nworkers'],
 		show_progress=config['show_progress'],
 	wildcard_constraints:
@@ -148,7 +132,7 @@ rule fetch_genome_set_34:
 # large and not every one is used.
 rule fetch_genome_set_3_fastq:
 	output:
-		'resources/genomes/set3/fastq/{genome}.fastq.gz'
+		f'{DL_RESOURCES}/genomes/set3/fastq/{{genome}}.fastq.gz'
 	params:
 		gs_dir=GCS_PREFIX + config['src_data']['genome_sets']['set3']['fastq'].rstrip('/'),
 	shell:
@@ -169,7 +153,7 @@ rule fetch_genome_set_3_fastq_all:
 # Download FASTA files for genome set 5
 rule fetch_genome_set_5:
 	output:
-		directory('resources/genomes/set5/fasta'),
+		directory(f'{DL_RESOURCES}/genomes/set5/fasta'),
 	params:
 		url=GCS_PREFIX + config['src_data']['genome_sets']['set5']['tarball'],
 	shell:
@@ -179,10 +163,10 @@ rule fetch_genome_set_5:
 		"""
 
 
-# Download all source data
+# Download all source data needed for main rules
 rule fetch_src_data:
 	input:
 		*rules.fetch_gambit_db.output,
 		*map(get_genomes_fasta_dir, ['set1', 'set2', 'set3', 'set4', 'set5']),
-		*rules.fetch_genome_set_5.output,
-		# TODO - only the needed Set 3 FASTQ files
+		# Only the needed set 3 FASTQ files
+		*expand(rules.fetch_genome_set_3_fastq.output, genome=config['figure_3']['genomes']),

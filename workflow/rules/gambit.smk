@@ -4,7 +4,7 @@
 # Generate signatures for genomes in each genome set
 rule gambit_signatures:
 	input:
-		fasta_dir="resources/genomes/{genomeset}/fasta",
+		fasta_dir=get_genomes_fasta_dir,
 		list_file=get_genomes_list_file,
 	output:
 		"intermediate-data/signatures/{genomeset}-{k}-{prefix}.h5",

@@ -9,6 +9,11 @@ show_progress: false
 # Number of simultaneous downloads for each genome download rule
 dl_nworkers: 6
 
+# Download source data to $REPO_ROOT/resources instead of $WORKDIR/resources.
+# This avoids having to re-download all source data when running in a different working directory.
+# Disable if testing download rules.
+dl_to_src_dir: true
+
 # Use HTTP protocol to access NCBI FTP server files instead of FTP (have had issues on some networks)
 ncbi_use_http: false
 

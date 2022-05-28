@@ -5,7 +5,7 @@ Rules that are not directly needed to generate the main or supplemental figures/
 # Run QUAST on assemblies in a genome set
 # (QUAST isn't installed into environment by default)
 rule genome_set_quast:
-	input: 'resources/genomes/{genomeset}/fasta'
+	input: get_genomes_fasta_dir
 	output: directory('extra/quast/{genomeset}')
 	threads: workflow.cores
 	params:

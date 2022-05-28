@@ -56,7 +56,7 @@ checkpoint fastani_query_chunks:
 # genomes for queries.
 rule fastani_chunk:
 	input:
-		fasta="resources/genomes/{genomeset}/fasta",
+		fasta=get_genomes_fasta_dir,
 		query_chunks=rules.fastani_query_chunks.output[0],
 		refs=get_genomes_list_file,
 	output:
