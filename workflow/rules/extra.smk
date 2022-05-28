@@ -18,13 +18,13 @@ rule genome_set_quast:
 
 # Generate genomes.csv for genome sets 3 and 4.
 # These are added to version control so it's not necessary to run normally.
-# Also don't actually set the output to replace the original file, we don't this rule to be run
+# Also don't actually set the output to replace the original file, we don't want this rule to be run
 # automatically when regular rules need the table.
 rule set_34_genomes_csv:
 	input: rules.genome_set_quast.output
 	output: 'extra/genomes-csv/{genomeset}-genomes.csv'
 	wildcard_constraints:
-		genomeset='set[34]',
+		genomeset='set(3a|3b|4)',
 	params:
 		filenames=lambda wc: get_genome_fasta_files(wc, full_path=False),
 		output='resources/genomes/{genomeset}/genomes.csv',
@@ -47,7 +47,7 @@ rule set_34_genomes_csv:
 
 def get_fastq_kmers_all_input(wildcards=None):
 	from gambit_pub.utils import stripext
-	genomes = list(map(stripext, get_genome_fasta_files('set3', full_path=False)))
+	genomes = list(map(stripext, get_genome_fasta_files(config['figure_3']['assemblies_genome_set'], full_path=False)))
 	return expand(rules.fastq_kmers.output, genome=genomes)
 
 # Run the fastq_kmers rule for all genomes in set 3

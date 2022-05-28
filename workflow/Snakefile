@@ -10,7 +10,7 @@ from gambit.util.io import read_lines, write_lines
 min_version("7.0")
 
 wildcard_constraints:
-	genomeset="set[12345]",
+	genomeset="set([1245]|3[ab])",
 	k="\d+",
 	prefix="[ACGT]+",
 
@@ -47,8 +47,9 @@ os.environ.update(
 K = config['gambit']['k']
 PREFIX = config['gambit']['prefix']
 
+ALL_GENOME_SETS = ['set1', 'set2', 'set3a', 'set3b', 'set4', 'set5']
 # Main genome sets compared in figures 1 and 2
-COMPARISON_GENOME_SETS = ['set1', 'set2', 'set3', 'set4']
+COMPARISON_GENOME_SETS = ['set1', 'set2', 'set3a', 'set3b', 'set4']
 
 
 ### Rules ###

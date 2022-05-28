@@ -42,15 +42,11 @@ src_data:
     signatures: "hesslab-gambit-public/databases/refseq-curated/1.0-beta/gambit-signatures-1.0b1-210719.h5"
 
   genome_sets:
-    set3:
-      fasta: "hesslab-gambit-public/genomes/set3/fasta/"
-#      fasta-a: "hesslab-gambit-public/genomes/set3/fasta-a/"
-#      fasta-b: "hesslab-gambit-public/genomes/set3/fasta-b/"
-      fastq: "hesslab-gambit-public/genomes/set3/fastq/"
-    set4:
-      fasta: "hesslab-gambit-public/genomes/set4/fasta/"
-    set5:
-      tarball: "hesslab-gambit-public/genomes/set5/fasta.tar.gz"
+    set3a: "hesslab-gambit-public/genomes/set3/fasta-a/"
+    set3b: "hesslab-gambit-public/genomes/set3/fasta-b/"
+    set4: "hesslab-gambit-public/genomes/set4/fasta/"
+    set5: "hesslab-gambit-public/genomes/set5/fasta.tar.gz"
+    set3_fastq: "hesslab-gambit-public/genomes/set3/fastq/"
 
 
 # Values to use for parameter space exploration (figure 2 and supplemental figure 1)
@@ -71,6 +67,10 @@ gambit_param_space:
 
 
 figure_3:
+  # Use assemblies from set 3a or 3b?
+  assemblies_genome_set: set3b
+
+  # Genomes to plot
   genomes:
     # Chosen to be around the median precision/recall of all genomes
     - "16AC1611141-CAP"

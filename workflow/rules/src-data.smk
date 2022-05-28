@@ -116,12 +116,12 @@ rule fetch_genome_set_34:
 		nworkers=config['dl_nworkers'],
 		show_progress=config['show_progress'],
 	wildcard_constraints:
-		genomeset="set[34]",
+		genomeset="set(3a|3b|4)",
 	run:
 		from gambit.util.io import read_lines
 		files = read_lines(input[0])
 
-		gs_dir = config['src_data']['genome_sets'][wildcards.genomeset]['fasta'].rstrip('/')
+		gs_dir = config['src_data']['genome_sets'][wildcards.genomeset].rstrip('/')
 		prefix = GCS_PREFIX + gs_dir + '/'
 		items = [(prefix + fname, fname, None) for fname in files]
 		fetch_genome_fasta_files(items, params['dl_dir'], output[0], params['nworkers'], params['show_progress'])
@@ -134,7 +134,7 @@ rule fetch_genome_set_3_fastq:
 	output:
 		f'{DL_RESOURCES}/genomes/set3/fastq/{{genome}}.fastq.gz'
 	params:
-		gs_dir=GCS_PREFIX + config['src_data']['genome_sets']['set3']['fastq'].rstrip('/'),
+		gs_dir=GCS_PREFIX + config['src_data']['genome_sets']['set3_fastq'].rstrip('/'),
 	shell:
 		"curl {params[gs_dir]}/{wildcards[genome]}.fastq.gz -o {output}"
 
@@ -155,7 +155,7 @@ rule fetch_genome_set_5:
 	output:
 		directory(f'{DL_RESOURCES}/genomes/set5/fasta'),
 	params:
-		url=GCS_PREFIX + config['src_data']['genome_sets']['set5']['tarball'],
+		url=GCS_PREFIX + config['src_data']['genome_sets']['set5'],
 	shell:
 		"""
 		mkdir {output}
@@ -167,6 +167,6 @@ rule fetch_genome_set_5:
 rule fetch_src_data:
 	input:
 		*rules.fetch_gambit_db.output,
-		*map(get_genomes_fasta_dir, ['set1', 'set2', 'set3', 'set4', 'set5']),
+		*map(get_genomes_fasta_dir, ALL_GENOME_SETS),
 		# Only the needed set 3 FASTQ files
 		*expand(rules.fetch_genome_set_3_fastq.output, genome=config['figure_3']['genomes']),
