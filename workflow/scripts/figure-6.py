@@ -3,8 +3,8 @@
 Expected Snakemake variables:
 
 * input
-    * genomes_csv: CSV file of genome attributes.
-    * pw_dists: CSV file of pairwise GAMBIT distances.
+    * genomes_csv: CSV file of genome attributes for genome set 5.
+    * pw_dists: CSV file of pairwise GAMBIT distances for genome set 5.
 * output: Figure PNG
 """
 
