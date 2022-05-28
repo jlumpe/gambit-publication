@@ -1,5 +1,4 @@
-
-name: CI
+name: Test
 
 on:
 #  push:
@@ -105,4 +104,4 @@ jobs:
 
       - name: Run workflow
         run: |
-          snakemake -cores all ${{ env.SNAKEMAKE_OPTS }}
+          snakemake --cores all ${{ env.SNAKEMAKE_OPTS }}
