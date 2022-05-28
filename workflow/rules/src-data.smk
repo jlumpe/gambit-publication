@@ -18,7 +18,7 @@ RESOURCES_TEST_DIR = 'resources/.test'
 GENOMES_DL_DIR = 'resources/genomes/.download'
 
 # URL prefix for NCBI files
-_ncbi_protocol = 'http' if config['src_data']['ncbi']['use_http'] else 'ftp'
+_ncbi_protocol = 'http' if config['ncbi_use_http'] else 'ftp'
 NCBI_FTP_PREFIX = _ncbi_protocol + '://ftp.ncbi.nlm.nih.gov/'
 
 # Prefix for GCS URLs
@@ -80,7 +80,7 @@ rule truncated_genome_list:
 	output: get_genomes_list_file(None, test=True)
 	params:
 		src=get_genomes_list_file(None, test=False),
-		n=config['test_mode']['genome_cap'],
+		n=config['test_genome_cap'],
 	shell:
 		"head -n {params[n]} {params[src]} > {output}"
 
@@ -90,7 +90,7 @@ rule truncated_genome_table:
 	output: get_genomes_table_file(None, test=True)
 	params:
 		src=get_genomes_table_file(None, test=False),
-		n=config['test_mode']['genome_cap'] + 1,
+		n=config['test_genome_cap'] + 1,
 	shell:
 		"head -n {params[n]} {params[src]} > {output}"
 
@@ -111,7 +111,7 @@ rule fetch_genome_set_12:
 	output: directory('resources/genomes/{genomeset}/fasta')
 	params:
 		dl_dir=f'{GENOMES_DL_DIR}/{{genomeset}}/fasta/',
-		nworkers=config['src_data']['nworkers'],
+		nworkers=config['dl_nworkers'],
 		show_progress=config['show_progress'],
 	wildcard_constraints:
 		genomeset="set[12]",
@@ -129,7 +129,7 @@ rule fetch_genome_set_34:
 	output: directory('resources/genomes/{genomeset}/fasta')
 	params:
 		dl_dir=f'{GENOMES_DL_DIR}/{{genomeset}}/fasta/',
-		nworkers=config['src_data']['nworkers'],
+		nworkers=config['dl_nworkers'],
 		show_progress=config['show_progress'],
 	wildcard_constraints:
 		genomeset="set[34]",

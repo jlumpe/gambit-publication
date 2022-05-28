@@ -2,10 +2,18 @@
 # Override this from the command line with --config test=1
 test: false
 
-
 # Whether to display progress bars for certain rules
 # Output can get screwed up if there are other running rules also printing to stdout
 show_progress: false
+
+# Number of simultaneous downloads for each genome download rule
+dl_nworkers: 6
+
+# Use HTTP protocol to access NCBI FTP server files instead of FTP (have had issues on some networks)
+ncbi_use_http: false
+
+# Truncate all genome sets to this size in test mode
+test_genome_cap: 20
 
 
 # Standard parameters for GAMBIT command line
@@ -38,13 +46,6 @@ src_data:
       fasta: "hesslab-gambit-public/genomes/set4/fasta/"
     set5:
       tarball: "hesslab-gambit-public/genomes/set5/fasta.tar.gz"
-
-  # Number of simultaneous downloads for each genome download rule
-  nworkers: 6
-
-  ncbi:
-    # Use HTTP protocol to access NCBI FTP server files instead of FTP (have had issues on some networks)
-    use_http: false
 
 
 # Values to use for parameter space exploration (figure 2 and supplemental figure 1)
@@ -98,13 +99,3 @@ figure_5:
       in_taxon: 655
       out_taxa: [634, 647]
       bin_width: 0.02
-
-
-# Options for test mode
-# For test mode overrides to options already defined in this file, see config-test.yaml.
-test_mode:
-  # Truncate all genome sets to this size
-  genome_cap: 20
-
-  # Truncate all leaf taxa in database to this many genomes
-  db_taxon_genomes_cap: 30
