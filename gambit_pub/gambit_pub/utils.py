@@ -18,9 +18,9 @@ def symlink_to_relative(dst, src, is_dir=False):
 
 def genome_set_label(gset):
     """Get a nicely formatted label for a genome set given its wildcard value."""
-    m = re.fullmatch(r'set(\d)', gset)
+    m = re.fullmatch(r'set(\d[a-z]?)', gset)
     assert m is not None
-    return 'Set ' + m.group(1)
+    return 'Set ' + m.group(1).upper()
 
 
 def stripext(filename):
