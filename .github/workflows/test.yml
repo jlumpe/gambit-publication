@@ -37,6 +37,7 @@ jobs:
       SNAKEMAKE_OPTS: "-p --show-failed-logs --config test=1"
       DATA_CACHE_PATHS: |
         resources/genomes/.download
+        resources/genomes/set3-common/fastq
         resources/genomes/set5/fasta
         resources/gambit-db/db-genomes.db
         resources/gambit-db/db-signatures.h5
@@ -59,6 +60,7 @@ jobs:
         with:
           path: ${{ env.CONDA }}/envs
           key: conda-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('env.yaml') }}
+        if: '!github.event.input.invalidateCondaCache'
 
       - name: Update Conda environment
         run: |
@@ -89,6 +91,7 @@ jobs:
         with:
           path: ${{ env.DATA_CACHE_PATHS }}
           key: data-${{ runner.os }}--${{ runner.arch }}
+        if: '!github.event.input.invalidateDataCache'
 
       - name: Download source data
         run: snakemake --cores 1 fetch_src_data ${{ env.SNAKEMAKE_OPTS }}
