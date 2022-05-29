@@ -32,8 +32,8 @@ rule fetch_gambit_db:
 		signatures_url=GCS_PREFIX + config['src_data']['gambit_db']['signatures'],
 	shell:
 		'''
-		curl -f -o {output.genomes} {params[genomes_url]}
-		curl -f -o {output.signatures} {params[signatures_url]}
+		curl -s -o {output.genomes} {params[genomes_url]}
+		curl -s -o {output.signatures} {params[signatures_url]}
 		'''
 
 
@@ -136,7 +136,7 @@ rule fetch_genome_set_3_fastq:
 	params:
 		gs_dir=GCS_PREFIX + config['src_data']['genome_sets']['set3_fastq'].rstrip('/'),
 	shell:
-		"curl {params[gs_dir]}/{wildcards[genome]}.fastq.gz -o {output}"
+		"curl -s {params[gs_dir]}/{wildcards[genome]}.fastq.gz -o {output}"
 
 
 def get_genome_set_3_fastq_files(wildcards=None):
@@ -159,7 +159,7 @@ rule fetch_genome_set_5:
 	shell:
 		"""
 		mkdir {output}
-		curl {params[url]} | tar -xzf - -C {output} --strip-components=1
+		curl -s {params[url]} | tar -xzf - -C {output} --strip-components=1
 		"""
 
 
