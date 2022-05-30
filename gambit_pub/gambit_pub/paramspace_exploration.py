@@ -18,6 +18,10 @@ STYLE_PARAMS = {
 }
 
 DEFAULT_AXIS_COLOR = 'blue'
+DEFAULT_K_LINE_STYLE = dict(
+	color=DEFAULT_AXIS_COLOR,
+	linestyle='dotted',
+)
 
 RELPLOT_KWS = dict(
 	kind='line',
@@ -125,6 +129,8 @@ def spearman_vs_k(paramdata, **kw):
 	return fg
 
 
-def highlight_default_axis(ax):
+def highlight_default_axis(ax, default_k):
 	for spine in ax.spines.values():
 		spine.set_color(DEFAULT_AXIS_COLOR)
+
+	ax.axvline(default_k, **DEFAULT_K_LINE_STYLE)

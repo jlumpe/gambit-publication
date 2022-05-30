@@ -76,7 +76,7 @@ rule figure_2a:
 		for plen, ax in fg.axes_dict.items():
 			ax.set_title(paramdata.prefix_map[plen, 0])
 
-		pex.highlight_default_axis(fg.axes_dict[paramdata.dflt_plen])
+		pex.highlight_default_axis(fg.axes_dict[paramdata.dflt_plen], paramdata.dflt_k)
 
 		fg.figure.savefig(output[0])
 
@@ -98,7 +98,7 @@ rule figure_2b:
 		for pver, ax in fg.axes_dict.items():
 			ax.set_title(paramdata.prefix_map[paramdata.dflt_plen, pver])
 
-		pex.highlight_default_axis(fg.axes_dict[paramdata.dflt_pver])
+		pex.highlight_default_axis(fg.axes_dict[paramdata.dflt_pver], paramdata.dflt_k)
 
 		fg.figure.savefig(output[0])
 
