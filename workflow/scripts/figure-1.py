@@ -30,12 +30,20 @@ ngs = len(genome_sets)
 
 plt.style.use('gambit')
 
-plt.rcParams.update({
-	'axes.grid': True,
-})
+XRANGE = (75, 100)
+YRANGE = (0, 1)
 
-SUBPLOT_SIZE = 5
-NBINS = 100
+DISPLOT_KW = dict(
+	col_wrap=3,
+	height=4,
+	bins=100,
+	binrange=(XRANGE, YRANGE),
+	facet_kws=dict(despine=False),
+)
+
+CORRELATION_TEXT_KW = dict(
+	fontsize=14,
+)
 
 
 ### Load data and do calculations ###
@@ -53,58 +61,45 @@ for gset, file in zip_strict(genome_sets, snakemake.input):
 	stats_rows.append((gset, df.shape[0], df_filtered.shape[0], corr))
 	plot_data.append(df_filtered)
 
+plot_df = pd.concat(plot_data, keys=genome_sets, names=['genome_set'])
+
 stats_df = pd.DataFrame(stats_rows, columns=['genome_set', 'npairs', 'ani_reported', 'spearmanr'])
+stats_df.set_index('genome_set', inplace=True)
 
 
 ### Plot ###
-
-fig, axes = plt.subplots(
-	1, ngs,
-	figsize=(ngs * SUBPLOT_SIZE, SUBPLOT_SIZE),
-	sharex=True,
-	sharey=True,
+fg = sns.displot(
+    data=plot_df.reset_index(),
+    col='genome_set',
+    x='ani',
+    y='gambit',
+	**DISPLOT_KW,
 )
 
-for ax, (_, row), df in zip_strict(axes, stats_df.iterrows(), plot_data):
-	ax.set_title(genome_set_label(row.genome_set))
-	ax.set_xlabel('ANI')
+for gset, ax in fg.axes_dict.items():
+	ax.set_title(genome_set_label(gset))
 
 	# Spearman correlation
+	rho = stats_df.loc[gset, 'spearmanr']
 	ax.text(
 		.05, .05,
-		f'$\\rho = {-row.spearmanr:.3f}$',
+		f'$\\rho = {-rho:.3f}$',
 		ha='left',
 		va='bottom',
-		fontsize=16,
 		transform=ax.transAxes,
+		**CORRELATION_TEXT_KW,
 	)
 
-	# ax.scatter(df['ani'], df['gambit'], s=1)
-	sns.histplot(
-		data=df,
-		x='ani',
-		y='gambit',
-		ax=ax,
-		bins=NBINS,
-		binrange=(
-			(df['ani'].min(), 100),
-			(0, 1),
-		),
-	)
+	ax.set_xlim(*XRANGE)
+	ax.set_ylim(*YRANGE)
+	ax.xaxis.set_major_formatter(PercentFormatter(decimals=0))
 
-
-### Finish axes ####
-
-axes[0].set_ylabel('GAMBIT Distance')
-axes[0].set_xlim(None, 100)
-axes[0].set_ylim(0, 1)
-axes[0].xaxis.set_major_formatter(PercentFormatter())
-
-fig.tight_layout()
+fg.set_axis_labels('ANI', 'GAMBIT Distance')
+fg.tight_layout()
 
 
 ### Save ###
 
-fig.savefig(snakemake.output['figure'])
+fg.savefig(snakemake.output['figure'])
 
-stats_df.to_csv(snakemake.output['stats'], index=False)
+stats_df.to_csv(snakemake.output['stats'])
