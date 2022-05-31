@@ -24,7 +24,7 @@ rule set_34_genomes_csv:
 	input: rules.genome_set_quast.output
 	output: 'extra/genomes-csv/{genomeset}-genomes.csv'
 	wildcard_constraints:
-		genomeset='set(3a|3b|4)',
+		genomeset='set[34]',
 	params:
 		filenames=lambda wc: get_genome_fasta_files(wc, full_path=False),
 		output='resources/genomes/{genomeset}/genomes.csv',

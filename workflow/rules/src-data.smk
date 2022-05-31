@@ -116,7 +116,7 @@ rule fetch_genome_set_34:
 		nworkers=config['dl_nworkers'],
 		show_progress=config['show_progress'],
 	wildcard_constraints:
-		genomeset="set(3a|3b|4)",
+		genomeset="set[34]",
 	run:
 		from gambit.util.io import read_lines
 		files = read_lines(input[0])

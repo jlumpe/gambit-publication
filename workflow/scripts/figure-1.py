@@ -34,7 +34,7 @@ XRANGE = (75, 100)
 YRANGE = (0, 1)
 
 DISPLOT_KW = dict(
-	col_wrap=3,
+	col_wrap=2,
 	height=4,
 	bins=100,
 	binrange=(XRANGE, YRANGE),
