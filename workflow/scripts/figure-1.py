@@ -38,6 +38,7 @@ DISPLOT_KW = dict(
 	height=4,
 	bins=100,
 	binrange=(XRANGE, YRANGE),
+	common_norm=False,
 	facet_kws=dict(despine=False),
 )
 
@@ -69,10 +70,10 @@ stats_df.set_index('genome_set', inplace=True)
 
 ### Plot ###
 fg = sns.displot(
-    data=plot_df.reset_index(),
-    col='genome_set',
-    x='ani',
-    y='gambit',
+	data=plot_df.reset_index(),
+	col='genome_set',
+	x='ani',
+	y='gambit',
 	**DISPLOT_KW,
 )
 
