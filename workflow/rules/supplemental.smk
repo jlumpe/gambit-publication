@@ -29,6 +29,9 @@ rule supplemental_figure_1:
 		for (plen, pver), ax in fg.axes_dict.items():
 			ax.set_title(paramdata.prefix_map[plen, pver])
 
-		pex.highlight_default_axis(fg.axes_dict[paramdata.dflt_plen, paramdata.dflt_pver])
+		pex.highlight_default_axis(
+			fg.axes_dict[paramdata.dflt_plen, paramdata.dflt_pver],
+			paramdata.dflt_k,
+		)
 
 		fg.figure.savefig(output[0])
