@@ -47,7 +47,7 @@ rule set_34_genomes_csv:
 
 def get_fastq_kmers_all_input(wildcards=None):
 	from gambit_pub.utils import stripext
-	genomes = list(map(stripext, get_genome_fasta_files(config['figure_3']['assemblies_genome_set'], full_path=False)))
+	genomes = list(map(stripext, get_genome_fasta_files('set3', full_path=False)))
 	return expand(rules.fastq_kmers.output, genome=genomes)
 
 # Run the fastq_kmers rule for all genomes in set 3
