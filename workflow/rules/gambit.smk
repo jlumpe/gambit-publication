@@ -17,7 +17,7 @@ rule gambit_signatures:
 			-l {input[list_file]} \
 			--ldir {input[fasta_dir]} \
 			-o {output[0]} \
-			2>&1 | cat
+			--no-progress
 		"""
 
 
@@ -29,7 +29,11 @@ rule gambit_pw_dists:
 		"intermediate-data/gambit-pw-dists/{genomeset}-{k}-{prefix}.csv",
 	threads: workflow.cores
 	shell:
-		"gambit dist -s --qs {input[0]} -o {output[0]} 2>&1 | cat"
+		"""gambit dist -s \
+			--qs {input[0]} \
+			-o {output[0]} \
+			--no-progress
+		"""
 
 
 rule gambit_vs_ani:
