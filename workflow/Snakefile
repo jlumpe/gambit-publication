@@ -59,6 +59,7 @@ include: "rules/fastani.smk"
 include: "rules/gambit.smk"
 include: "rules/figures.smk"
 include: "rules/supplemental.smk"
+include: "rules/benchmark.smk"
 include: "rules/extra.smk"
 
 if TEST:

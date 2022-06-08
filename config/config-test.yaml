@@ -10,3 +10,6 @@ gambit_param_space:
   base_prefix:
     - ATGACTG
     - ATCATTT
+
+benchmarks:
+  replicates: 2
