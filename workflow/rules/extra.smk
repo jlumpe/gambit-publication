@@ -21,26 +21,33 @@ rule genome_set_quast:
 # Also don't actually set the output to replace the original file, we don't want this rule to be run
 # automatically when regular rules need the table.
 rule set_34_genomes_csv:
-	input: rules.genome_set_quast.output
-	output: 'extra/genomes-csv/{genomeset}-genomes.csv'
+	input:
+		quast=rules.genome_set_quast.output
+	output: 'extra/genomes-csv/{genomeset}.csv'
 	wildcard_constraints:
 		genomeset='set[34]',
 	params:
-		filenames=lambda wc: get_genome_fasta_files(wc, full_path=False),
-		output='resources/genomes/{genomeset}/genomes.csv',
+		files=lambda wc: get_genome_fasta_files(wc),
 	run:
+		from gambit_pub.download import get_md5
+
 		results = pd.read_csv(os.path.join(input[0], 'transposed_report.tsv'), sep='\t')
 
 		# QUAST replaces dashses with underscores in file names, replace with original file names
 		# but check consistency
-		real_ids = [filename.split('.')[0] for filename in params['filenames']]
+		filenames = list(map(os.path.basename, params['files']))
+		real_ids = [fn.split('.')[0] for fn in filenames]
 		quast_ids = results['Assembly']
-
 		assert all(rid.replace('-', '_') == qid for rid, qid in zip(real_ids, quast_ids))
 
+		# Pull columns from QUAST results
 		results = results[['# contigs (>= 0 bp)', 'Total length (>= 0 bp)', 'N50', 'L50']]
 		results.columns = ['n_contigs', 'total_length', 'N50', 'L50']
 		results.index = pd.Series(real_ids, name='id')
+
+		# Add MD5 hashes and full file names
+		results['md5'] = [get_md5(open(f, 'rb')) for f in params['files']]
+		results['filename'] = filenames
 
 		results.to_csv(output[0])
 
