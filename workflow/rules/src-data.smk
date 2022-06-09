@@ -138,8 +138,8 @@ rule fetch_genome_set_3_fastq:
 
 
 def get_genome_set_3_fastq_files(wildcards=None):
-	from gambit_pub.utils import stripext
-	genomes = list(map(stripext, get_genome_fasta_files('set3', full_path=False)))
+	from gambit.cli.common import strip_seq_file_ext
+	genomes = list(map(strip_seq_file_ext, get_genome_fasta_files('set3', full_path=False)))
 	return expand(rules.fetch_genome_set_3_fastq.output, genome=genomes)
 
 # Download FASTQ files for all set 3 genomes

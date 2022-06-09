@@ -9,6 +9,8 @@ Expected Snakemake variables:
 * output: CSV file to write to.
 """
 
+from gambit.cli.common import strip_seq_file_ext
+
 import numpy as np
 import pandas as pd
 
@@ -51,8 +53,8 @@ ani1 = np.full(npairs, np.nan)
 ani2 = np.full(npairs, np.nan)
 
 for _, row in fastani.iterrows():
-	i = filename_to_index[row.file1]
-	j = filename_to_index[row.file2]
+	i = filename_to_index[strip_seq_file_ext(row.file1)]
+	j = filename_to_index[strip_seq_file_ext(row.file2)]
 
 	if i > j:
 		ani1[ij_to_pair(i, j)] = row.ani

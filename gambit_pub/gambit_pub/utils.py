@@ -21,8 +21,3 @@ def genome_set_label(gset):
     m = re.fullmatch(r'set(\d[a-z]?)', gset)
     assert m is not None
     return 'Set ' + m.group(1).upper()
-
-
-def stripext(filename):
-    """Remove the extension(s) from a file name."""
-    return filename.split('.', 1)[0]

@@ -119,7 +119,7 @@ rule fastq_kmers:
 		genomes_table=get_genomes_table_file('set3'),
 	output: directory('intermediate-data/fastq-kmers/{genome}/')
 	params:
-		fasta_name='{genome}.fasta',
+		fasta_id='{genome}',
 		min_phred=[0, 10, 20, 30],
 		truncate_reads=100_000 if TEST else None,
 	wildcard_constraints:
@@ -129,11 +129,11 @@ rule fastq_kmers:
 
 
 def get_figure_3_genomes(wildcards=None):
-	from gambit_pub.utils import stripext
+	from gambit.cli.common import strip_seq_file_ext
 
 	if TEST:
 		fasta_files = get_genome_fasta_files('set3', test=True, full_path=False)
-		return [stripext(f) for f in fasta_files[:2]]
+		return [strip_seq_file_ext(f) for f in fasta_files[:2]]
 	else:
 		return config['figure_3']['genomes']
 

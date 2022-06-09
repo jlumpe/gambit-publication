@@ -7,7 +7,7 @@ Expected Snakemake variables:
   * fastq: FASTQ file.
   * genomes_table: CSV file of genome/assembly data.
 * params
-  * fasta_name: Name of FASTA file to look up the correct signature.
+  * fasta_id: ID used to look up the correct FASTA signature.
   * min_phred: Minimum PHRED scores to filter reads by.
   * truncate_reads: Only process this many reads (speed up this rule for testing).
 * output: Directory with the following files:
@@ -39,8 +39,8 @@ fasta_stats = fasta_df.loc[snakemake.wildcards['genome']]
 fasta_sigs = load_signatures(snakemake.input['signatures'])
 kmerspec = fasta_sigs.kmerspec
 
-fasta_filename = snakemake.params['fasta_name']
-(fasta_sig_index,) = np.flatnonzero(fasta_sigs.ids == fasta_filename)
+fasta_id = snakemake.params['fasta_id']
+(fasta_sig_index,) = np.flatnonzero(fasta_sigs.ids == fasta_id)
 fasta_sig = fasta_sigs[fasta_sig_index]
 fasta_sig_len = len(fasta_sig)
 

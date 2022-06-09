@@ -124,7 +124,7 @@ ngenomes = genomes_df.shape[0]
 
 dists_df = pd.read_csv(snakemake.input['pw_dists'], index_col=0)
 assert np.array_equal(dists_df.index, dists_df.columns)
-assert np.array_equal(dists_df.index, [id_ + '.fasta' for id_ in genomes_df['id']])
+assert np.array_equal(dists_df.index, genomes_df['id'])
 dmat = dists_df.values
 
 

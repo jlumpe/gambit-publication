@@ -30,13 +30,14 @@ rule set_34_genomes_csv:
 		files=lambda wc: get_genome_fasta_files(wc),
 	run:
 		from gambit_pub.download import get_md5
+		from gambit.cli.common import strip_seq_file_ext
 
 		results = pd.read_csv(os.path.join(input[0], 'transposed_report.tsv'), sep='\t')
 
 		# QUAST replaces dashses with underscores in file names, replace with original file names
 		# but check consistency
 		filenames = list(map(os.path.basename, params['files']))
-		real_ids = [fn.split('.')[0] for fn in filenames]
+		real_ids = list(map(strip_seq_file_ext, filenames))
 		quast_ids = results['Assembly']
 		assert all(rid.replace('-', '_') == qid for rid, qid in zip(real_ids, quast_ids))
 
@@ -53,8 +54,8 @@ rule set_34_genomes_csv:
 
 
 def get_fastq_kmers_all_input(wildcards=None):
-	from gambit_pub.utils import stripext
-	genomes = list(map(stripext, get_genome_fasta_files('set3', full_path=False)))
+	from gambit.cli.common import strip_seq_file_ext
+	genomes = list(map(strip_seq_file_ext, get_genome_fasta_files('set3', full_path=False)))
 	return expand(rules.fastq_kmers.output, genome=genomes)
 
 # Run the fastq_kmers rule for all genomes in set 3
