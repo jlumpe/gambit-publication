@@ -42,6 +42,7 @@ src_data:
     signatures: "hesslab-gambit-public/databases/refseq-curated/1.0-beta/gambit-signatures-1.0b1-210719.h5"
 
   genome_sets:
+    # Sets 1 and 2 downloaded from NCBI, have URls in their genomes.csv files
     set3: "hesslab-gambit-public/genomes/set3/fasta/"
     set4: "hesslab-gambit-public/genomes/set4/fasta/"
     set5: "hesslab-gambit-public/genomes/set5/fasta.tar.gz"

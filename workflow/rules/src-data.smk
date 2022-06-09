@@ -101,15 +101,15 @@ rule fetch_genome_set_12:
 	run:
 		table = pd.read_csv(input[0])
 		items = [
-			(NCBI_FTP_PREFIX + row.ftp_path, row.assembly_accession + '.fa.gz', row.md5)
+			(NCBI_FTP_PREFIX + row.ftp_path, row.filename, row.md5)
 			for _, row in table.iterrows()
 		]
 		fetch_genome_fasta_files(items, params['dl_dir'], output[0], params['nworkers'], params['show_progress'])
 
 
-# Get genomes from sets 3 and 4, urls from config file
+# Get genomes from sets 3 and 4, Google Cloud Storage urls from config file
 rule fetch_genome_set_34:
-	input: get_genomes_list_file
+	input: get_genomes_table_file
 	output: directory(f'{DL_RESOURCES}/genomes/{{genomeset}}/fasta')
 	params:
 		dl_dir=f'{GENOMES_DL_DIR}/{{genomeset}}',
@@ -118,12 +118,10 @@ rule fetch_genome_set_34:
 	wildcard_constraints:
 		genomeset="set[34]",
 	run:
-		from gambit.util.io import read_lines
-		files = read_lines(input[0])
-
+		table = pd.read_csv(input[0])
 		gs_dir = config['src_data']['genome_sets'][wildcards.genomeset].rstrip('/')
 		prefix = GCS_PREFIX + gs_dir + '/'
-		items = [(prefix + fname, fname, None) for fname in files]
+		items = [(prefix + row.filename, row.filename, row.md5) for _, row in table.iterrows()]
 		fetch_genome_fasta_files(items, params['dl_dir'], output[0], params['nworkers'], params['show_progress'])
 
 
