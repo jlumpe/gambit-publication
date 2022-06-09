@@ -12,4 +12,5 @@ gambit_param_space:
     - ATCATTT
 
 benchmarks:
+  ncores: [4]
   replicates: 2

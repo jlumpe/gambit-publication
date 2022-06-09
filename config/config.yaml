@@ -109,7 +109,7 @@ benchmark_dry_run: false
 benchmarks:
   # Default number of cores to test
   # Specific commands which don't support multiple threads (Mash sketching) will only be run with 1.
-  ncores: [1, 4, 8]
+  ncores: [1, 2, 4, 8, 16]
 
   # Number of times to run each command
   replicates: 5
@@ -136,7 +136,7 @@ benchmarks:
 
   fastani:
     # Only test with the full core count, FastANI is REALLY slow relative to the others
-    ncores: [8]
+    ncores: [16]
 
     params:
       default:

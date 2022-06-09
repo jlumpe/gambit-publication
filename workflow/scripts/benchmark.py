@@ -148,7 +148,7 @@ p = Path('..')
 # GAMBIT
 for params_key, params in gambit_conf['params'].items():
 	for ncores in gambit_conf.get('ncores', default_ncores):
-		commands['gambit', 'query_sigs', 'params_key', 'ncores'] = \
+		commands['gambit', 'query_sigs', params_key, ncores] = \
 			bm.gambit_signatures_command(p / query_list_file, 'query_sigs.h5', params, ncores)
 		commands['gambit', 'ref_sigs', params_key, ncores] = \
 			bm.gambit_signatures_command(p / ref_list_file, 'ref_sigs.h5', params, ncores)
@@ -189,7 +189,7 @@ for r in range(replicates):
 
 	for i, (key, command) in enumerate(commands_iter):
 		keystr = '-'.join(map(str, key))
-		log(f'Running {keystr}:', leading=1)
+		log(f'Running {keystr} ({i + 1} of {len(commands)})', leading=1)
 		log_command(command)
 
 		if dry_run:
@@ -229,6 +229,7 @@ rows = [
 	for r, *key, result in items
 ]
 df = pd.DataFrame(rows, columns=['replicate', 'tool', 'command', 'paramset', 'ncores', 'run_order', 'real', 'user', 'sys'])
+df.sort_values(['replicate', 'tool', 'command', 'paramset', 'ncores'], inplace=True)
 df.to_csv(snakemake.output['table'], index=False)
 
 extra = dict(
