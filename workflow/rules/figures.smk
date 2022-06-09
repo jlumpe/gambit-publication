@@ -168,6 +168,7 @@ rule figure_4_subplot:
 # Generate all subplots of figure 4
 rule figure_4:
 	input: expand(rules.figure_4_subplot.output, subplot=list(config['figure_4']['subplots']))
+	output: touch('results/figure-4/.completed')
 
 
 ### Figure 5 ###
@@ -189,6 +190,7 @@ rule figure_5_subplot:
 # Generate all subplots of figure 5
 rule figure_5:
 	input: expand(rules.figure_5_subplot.output, subplot=list(config['figure_5']['subplots']))
+	output: touch('results/figure-5/.completed')
 
 
 ### Figure 6 ###
