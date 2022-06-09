@@ -12,11 +12,11 @@ on:
         default: "master"
       invalidateCondaCache:
         description: "Invalidate cached Conda environment"
-        required: false
+        required: true
         type: boolean
       invalidateDataCache:
         description: "Invalidate cached source data"
-        required: false
+        required: true
         type: boolean
 
 
@@ -24,9 +24,6 @@ jobs:
   test:
 
     runs-on: ubuntu-latest
-
-    strategy:
-      fail-fast: false
 
     defaults:
       run:
@@ -66,7 +63,7 @@ jobs:
         run: |
           mamba env update -n gambit-pub -f env.yaml
           mamba install -n gambit-pub Cython gcc
-        if: steps.restore-conda.outputs.cache-hit != 'true' || github.event.input.invalidateCondaCache
+        if: steps.restore-conda.outputs.cache-hit != 'true'
 
       - name: Save conda environment
         id: cache-conda
@@ -74,7 +71,7 @@ jobs:
         with:
           path: ${{ env.CONDA }}/envs
           key: ${{ steps.restore-conda.outputs.primary-key }}
-        if: steps.restore-conda.outputs.cache-hit != 'true' || github.event.input.invalidateCondaCache
+        if: steps.restore-conda.outputs.cache-hit != 'true'
 
       # Environment setup done
 
