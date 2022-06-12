@@ -30,7 +30,8 @@ rule gambit_pw_dists:
 		"intermediate-data/gambit-pw-dists/{genomeset}-{k}-{prefix}.csv",
 	threads: workflow.cores
 	shell:
-		"""gambit dist -s \
+		"""
+		gambit dist -s \
 			-c {threads} \
 			--qs {input[0]} \
 			-o {output[0]} \
