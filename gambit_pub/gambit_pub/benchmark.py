@@ -92,7 +92,7 @@ def parse_time_output(result_file):
 	return TimeResult(*map(float, parts))
 
 
-def gambit_signatures_command(list_file, output, params, ncores, relative_to=None):
+def gambit_signatures_command(list_file, output, params, ncores):
 	args = [
 		'gambit', 'signatures', 'create',
 		'-c', ncores,
@@ -105,7 +105,7 @@ def gambit_signatures_command(list_file, output, params, ncores, relative_to=Non
 	return Command(args)
 
 
-def gambit_dist_command(query_sigs, ref_sigs, output, ncores, relative_to=None):
+def gambit_dist_command(query_sigs, ref_sigs, output, ncores):
 	args = [
 		'gambit', 'dist',
 		'-c', ncores,
@@ -117,7 +117,7 @@ def gambit_dist_command(query_sigs, ref_sigs, output, ncores, relative_to=None):
 	return Command(args)
 
 
-def fastani_command(query_list, ref_list, output, params, ncores, relative_to=None):
+def fastani_command(query_list, ref_list, output, params, ncores):
 	args = [
 		'fastANI',
 		'-k', params['k'],
@@ -130,7 +130,7 @@ def fastani_command(query_list, ref_list, output, params, ncores, relative_to=No
 	return Command(args)
 
 
-def mash_sketch_command(files, output, params, relative_to=None):
+def mash_sketch_command(files, output, params):
 	# Mash sketching does not support parallelization
 	args = [
 		'mash', 'sketch',
@@ -142,7 +142,7 @@ def mash_sketch_command(files, output, params, relative_to=None):
 	return Command(args)
 
 
-def mash_dist_command(query_sketch, ref_sketch, params, ncores, relative_to=None):
+def mash_dist_command(query_sketch, ref_sketch, params, ncores):
 	# Output is recorded in stdout
 	args = [
 		'mash', 'dist',
