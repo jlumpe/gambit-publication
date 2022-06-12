@@ -4,20 +4,18 @@ Combine pairwise GAMBIT distances and FastANI output into single table.
 Expected Snakemake variables:
 
 * input
-	gambit: Gambit distance matrix in CSV format.
-	fastani: FastANI output.
-* output: CSV file to write to.
+  * gambit: Gambit distance matrix in CSV format.
+  * fastani: Formatted FastANI output from format_fastani_results rule.
+* output:
+  * pairs: CSV file of GAMBIT and FastANI scores for all genome pairs.
+  * stats: JSON file of statistics, including Pearson and Spearman correlation.
 """
-
-from gambit.cli.common import strip_seq_file_ext
 
 import numpy as np
 import pandas as pd
+from scipy.stats import pearsonr, spearmanr
 
-
-def ij_to_pair(i, j):
-	"""Convert 2D (i, j) index (i > j) to 1D pair index."""
-	return i * (i - 1) // 2 + j
+import gambit.util.json as gjson
 
 
 ### Load data ###
@@ -25,49 +23,43 @@ def ij_to_pair(i, j):
 gambit = pd.read_csv(snakemake.input['gambit'], index_col=0)
 assert np.array_equal(gambit.index, gambit.columns)
 
-fastani = pd.read_csv(snakemake.input['fastani'], sep='\t', names=['file1', 'file2', 'ani', 'mapped', 'fragments'])
-
-
-### Make table index ###
+fastani = pd.read_csv(snakemake.input['fastani'], index_col=[0, 1])
 
 ng = gambit.shape[0]
 npairs = ng * (ng - 1) // 2
-
-g1 = np.zeros(npairs, dtype=int)
-g2 = np.zeros(npairs, dtype=int)
-
-for i in range(ng):
-	for j in range(i):
-		p = ij_to_pair(i, j)
-		g1[p] = i
-		g2[p] = j
-
-# Double-check indexing math is right
-assert np.array_equal(list(map(ij_to_pair, g1, g2)), np.arange(npairs))
+assert fastani.shape[0] == npairs
 
 
-### Mean FastANI by pair ###
+### Combine ###
 
-filename_to_index = {f: i for i, f in enumerate(gambit.index)}
-ani1 = np.full(npairs, np.nan)
-ani2 = np.full(npairs, np.nan)
-
-for _, row in fastani.iterrows():
-	i = filename_to_index[strip_seq_file_ext(row.file1)]
-	j = filename_to_index[strip_seq_file_ext(row.file2)]
-
-	if i > j:
-		ani1[ij_to_pair(i, j)] = row.ani
-	if i < j:
-		ani2[ij_to_pair(j, i)] = row.ani
-
-ani_mean = (ani1 + ani2) / 2
+combined = fastani['ani_mean'].to_frame('ani')
+combined['gambit'] = np.fromiter(
+	(gambit.values[i, j] for i, j in combined.index),
+	dtype=np.float32,
+	count=npairs
+)
 
 
-### Output table ###
+### Statistics ###
 
-df_out = pd.DataFrame(index=pd.MultiIndex.from_arrays([g1, g2], names=['genome1', 'genome2']))
-df_out['gambit'] = gambit.values[g1, g2]
-df_out['ani'] = ani_mean
+both_reported = ~pd.isnull(fastani['ani1']) & ~pd.isnull(fastani['ani2'])
+either_reported = ~pd.isnull(fastani['ani1']) | ~pd.isnull(fastani['ani2'])
+x = combined['gambit'][both_reported]
+y = combined['ani'][both_reported]
 
-df_out.to_csv(snakemake.output[0])
+stats = dict(
+	ngenomes=ng,
+	npairs=npairs,
+	ani_both_reported=both_reported.sum(),
+	ani_either_reported=either_reported.sum(),
+	pearson=pearsonr(x, y)[0],
+	spearman=spearmanr(x, y)[0],
+)
+
+
+### Output ###
+
+combined.to_csv(snakemake.output['pairs'])
+
+with open(snakemake.output['stats'], 'wt') as f:
+	gjson.dump(stats, f)

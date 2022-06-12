@@ -39,18 +39,19 @@ rule gambit_pw_dists:
 		"""
 
 
+# Comparison of GAMBIT distance and ANI (via FastANI)
 rule gambit_vs_ani:
 	input:
 		gambit=rules.gambit_pw_dists.output[0],
-		fastani=rules.fastani.output[0],
+		fastani=rules.format_fastani_results.output[0],
 	output:
-		"intermediate-data/gambit-vs-ani/{genomeset}-{k}-{prefix}.csv",
-	script:
-		"../scripts/gambit-vs-ani.py"
+		pairs='intermediate-data/gambit-vs-ani/{genomeset}-{k}-{prefix}.csv',
+		stats='intermediate-data/gambit-vs-ani/{genomeset}-{k}-{prefix}.json',
+	script: '../scripts/gambit-vs-ani.py'
 
 
 @cache
-def gambit_paramspace(wildcards):
+def get_gambit_paramspace(wildcards):
 	"""Parameter space to explore for GAMBIT distance / ANI correlation.
 
 	The "paramspace" wildcard must be one of several predefined options.
@@ -65,8 +66,8 @@ def gambit_paramspace(wildcards):
 		args = (values['k'], values['prefix_len'], values['base_prefix'][0])
 	elif wildcards.paramspace == 'prefix_sequence':
 		args = (values['k'], len(PREFIX), values['base_prefix'])
-	# elif wildcards.paramspace == 'default_only':
-	# 	args = (K, len(PREFIX), PREFIX)
+	elif wildcards.paramspace == 'default_only':
+		args = (K, len(PREFIX), PREFIX)
 	else:
 		raise ValueError(f'Invalid value for "paramspace" wildcard: {wildcards.paramspace}')
 
@@ -74,17 +75,28 @@ def gambit_paramspace(wildcards):
 
 def gambit_ani_correlation_input(wildcards):
 	"""Input for gambit_ani_correlation rule."""
-	params_df = gambit_paramspace(wildcards)
+	params_df = get_gambit_paramspace(wildcards)
 	return [
-		expand(rules.gambit_vs_ani.output, **row.to_dict())[0]
+		expand(rules.gambit_vs_ani.output['stats'], **row.to_dict())[0]
 		for _, row in params_df.iterrows()
 	]
 
-# Calculate spearman correlation of GAMBIT distance vs ANI for a range of parameter values.
+# Consolidate GAMBIT distance vs ANI statistics for a range of parameter values.
 # "paramspace" wildcard must be one of several predefined strings.
 rule gambit_ani_correlation:
-	params:
-		params_df=gambit_paramspace,
 	input: gambit_ani_correlation_input,
 	output: 'results/gambit-ani-correlation/{paramspace}.csv'
-	script: '../scripts/gambit-vs-ani-correlation.py'
+	params:
+		params_df=get_gambit_paramspace,
+	run:
+		import json, pandas as pd
+
+		stats_rows = []
+		for stats_file in input:
+			with open(stats_file) as f:
+				stats_rows.append(json.load(f))
+
+		stats_df = pd.DataFrame(stats_rows)
+
+		combined = pd.concat([params['params_df'], stats_df], axis=1)
+		combined.to_csv(output[0], index=False)
