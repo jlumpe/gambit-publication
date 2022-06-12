@@ -8,7 +8,7 @@ We run FastANI for each query chunk and then glue the outputs together.
 """
 
 
-FASTANI_CHUNKS_DIR = "intermediate-data/fastani/chunks/{genomeset}"
+FASTANI_CHUNKS_DIR = 'intermediate-data/fastani/chunks/{genomeset}'
 
 
 def get_fastani_input(wildcards):
@@ -25,8 +25,7 @@ def get_fastani_input(wildcards):
 checkpoint fastani_query_chunks:
 	input:
 		list_file=get_genomes_list_file,
-	output:
-		directory(f"{FASTANI_CHUNKS_DIR}/queries")
+	output: directory(f"{FASTANI_CHUNKS_DIR}/queries")
 	run:
 		out_dir = Path(output[0])
 		out_dir.mkdir()
@@ -59,8 +58,7 @@ rule fastani_chunk:
 		fasta=get_genomes_fasta_dir,
 		query_chunks=rules.fastani_query_chunks.output[0],
 		refs=get_genomes_list_file,
-	output:
-		temporary(f"{FASTANI_CHUNKS_DIR}/{{chunk}}.tsv")
+	output: temporary(f'{FASTANI_CHUNKS_DIR}/{{chunk}}.tsv')
 	wildcard_constraints:
 		chunk="\d+-\d+"
 	params:
@@ -78,12 +76,18 @@ rule fastani_chunk:
 		 """
 
 
-# Get complete result file. This is the only rule whose output is needed in other files.
+# Concatenate chunks to get the complete result file.
 rule fastani:
-	input:
-		get_fastani_input
-	output:
-		protected("intermediate-data/fastani/{genomeset}.tsv")
-	shell:
-		# Concatenate all chunks into a single output file
-		"cat {input} > {output}"
+	input: get_fastani_input
+	output: protected('intermediate-data/fastani/{genomeset}.tsv')
+	shell: 'cat {input} > {output}'
+
+
+# Convert results file from FastANI to a somewhat better format.
+# This is the only rule whose output is needed in other files.
+rule format_fastani_results:
+	input: rules.fastani.output
+	output: 'intermediate-data/fastani/{genomeset}-formatted.csv'
+	params:
+		filenames=lambda wc: get_genome_fasta_files(wc, full_path=False),
+	script: '../scripts/format-fastani-pw-output.py'
