@@ -36,6 +36,7 @@ FACET_KWS = dict(
 
 
 def make_params_df(k, prefix_len, base_prefixes, genome_sets):
+	"""Make parameter space table from the Cartesian product of the given parameter values."""
 	k = np.atleast_1d(k)
 	prefix_len = np.atleast_1d(prefix_len)
 	base_prefixes = np.atleast_1d(base_prefixes)
@@ -58,8 +59,8 @@ def get_param_data(stats_file, config):
 
 	Parameters
 	----------
-	params_file
-		CSV file created by the `gambit-vs-ani-correlation.py` script.
+	stats_file
+		CSV file output by the `gambit_ani_correlation` rule.
 	config
 		Snakemake config dict.
 

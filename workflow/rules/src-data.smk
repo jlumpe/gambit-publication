@@ -68,7 +68,7 @@ def get_genome_fasta_files(wildcards_or_genomeset, test=TEST, full_path=True):
 	"""Get paths of FASTA files for the given genome set (relative to root directory)."""
 	gset = _get_genomeset(wildcards_or_genomeset, require=True)
 
-	# Ensure we've created the truncated version of this file
+	# Ensure we've created the truncated version of the list file
 	if test:
 		checkpoints.truncated_genome_list.get(genomeset=gset)
 
