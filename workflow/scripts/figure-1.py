@@ -2,7 +2,9 @@
 
 Expected Snakemake variables:
 
-* input: gambit_vs_ani rule output for each genome set.
+* input:
+  * pairs: "pairs" output of gambit_vs_ani rule for each genome set.
+  * stats: "stats" output of gambit_vs_ani rule for each genome set.
 * params
   * genome_sets: Genome set IDs.
 * output:
@@ -10,10 +12,11 @@ Expected Snakemake variables:
   * stats: Statistics CSV file.
 """
 
+import json
+
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-from scipy.stats import spearmanr
 from matplotlib.ticker import PercentFormatter
 
 from gambit.util.misc import zip_strict
@@ -52,20 +55,16 @@ CORRELATION_TEXT_KW = dict(
 plot_data = []
 stats_rows = []
 
-for gset, file in zip_strict(genome_sets, snakemake.input):
-	data = dict()
+for gset, pairs_in, stats_in in zip_strict(genome_sets, snakemake.input['pairs'], snakemake.input['stats']):
+	df = pd.read_csv(pairs_in, index_col=[0, 1])
+	plot_data.append(df.dropna())
 
-	df = pd.read_csv(file, index_col=[0, 1])
-	df_filtered = df.dropna()
-	corr = spearmanr(df_filtered['ani'], df_filtered['gambit']).correlation
-
-	stats_rows.append((gset, df.shape[0], df_filtered.shape[0], corr))
-	plot_data.append(df_filtered)
+	with open(stats_in) as f:
+		stats_rows.append(json.load(f))
 
 plot_df = pd.concat(plot_data, keys=genome_sets, names=['genome_set'])
 
-stats_df = pd.DataFrame(stats_rows, columns=['genome_set', 'npairs', 'ani_reported', 'spearmanr'])
-stats_df.set_index('genome_set', inplace=True)
+stats_df = pd.DataFrame(stats_rows, index=pd.Series(genome_sets, name='genome_set'))
 
 
 ### Plot ###
@@ -81,7 +80,7 @@ for gset, ax in fg.axes_dict.items():
 	ax.set_title(genome_set_label(gset))
 
 	# Spearman correlation
-	rho = stats_df.loc[gset, 'spearmanr']
+	rho = stats_df.loc[gset, 'spearman']
 	ax.text(
 		.05, .05,
 		f'$\\rho = {-rho:.3f}$',
