@@ -1,0 +1,69 @@
+# Benchmark-specific config
+# This is merged with the main config file.
+
+# Use --config benchmark_dry_run=1 to just print commands to be run
+benchmark_dry_run: false
+
+
+# Settings for genomic distance (GAMBIT vs Mash vs FastANI) benchmarks
+dist_benchmarks:
+  # Default number of cores to test
+  # Specific commands which don't support multiple threads (Mash sketching) will only be run with 1.
+  ncores: [1, 2, 4, 8, 16]
+  replicates: 3
+  shuffle: true
+
+  # Query and reference genomes, shared between all commands
+  # Add more entries to test different combinations
+  genomes:
+    # Use Set 1 vs itself because we know that FastANI reports a value for all pairs.
+    set1_vs_set1:
+      queries:
+        genome_set: set1
+        subsample: 100
+      refs:
+        genome_set: set1
+        subsample: null
+
+    # Set 4 genomes are obtained from actual clinical samples in a public health lab and so are
+    # representative of typical GAMBIT query sequences. Set 2 is a diverse set of high-quality
+    # RefSeq assemblies and so approximates a (vey small) reference database.
+    set4_vs_set2:
+      queries:
+        genome_set: set4
+        subsample: null
+      refs:
+        genome_set: set2
+        subsample: null
+
+  # GAMBIT parameters
+  gambit:
+    params:
+      default:
+        k: 11
+        prefix: ATGAC
+
+  # FastANI parameters
+  fastani:
+    # Only test with the full core count, FastANI is REALLY slow relative to the others
+    ncores: [16]
+
+    params:
+      default:
+        k: 16  # Default
+        fraglen: 3000  # Default
+
+  # Mash parameters
+  mash:
+    params:
+      # Test with sketch size 10^[3, 4, 5] as in FastANI paper
+      # Use default value for k
+      s_1e3:
+        k: 21
+        sketch_size: 1000
+      s_1e4:
+        k: 21
+        sketch_size: 10000
+      s_1e5:
+        k: 21
+        sketch_size: 100000

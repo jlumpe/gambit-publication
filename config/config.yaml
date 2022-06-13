@@ -1,3 +1,5 @@
+# Main config file
+
 # If we're running in test mode.
 # Override this from the command line with --config test=1
 test: false
@@ -102,69 +104,3 @@ figure_5:
       out_taxa: [634, 647]
       bin_width: 0.02
 
-
-# Use --config benchmark_dry_run=1 to just print commands to be run
-benchmark_dry_run: false
-
-benchmarks:
-  # Default number of cores to test
-  # Specific commands which don't support multiple threads (Mash sketching) will only be run with 1.
-  ncores: [1, 2, 4, 8, 16]
-
-  # Number of times to run each command
-  replicates: 5
-
-  # Randomize order of all commands to be run each round?
-  shuffle: true
-
-  # Query and reference genomes, shared between all commands
-  # Add more entries to test different combinations
-  genomes:
-    # Use Set 1 vs itself because we know that FastANI reports a value for all pairs.
-    set1_vs_set1:
-      queries:
-        genome_set: set1
-        subsample: 100
-      refs:
-        genome_set: set1
-        subsample: null
-
-    # Set 4 genomes are obtained from actual clinical samples in a public health lab and so are
-    # representative of typical GAMBIT query sequences. Set 2 is a diverse set of high-quality
-    # RefSeq assemblies and so approximates a (vey small) reference database.
-    set4_vs_set2:
-      queries:
-        genome_set: set4
-        subsample: null
-      refs:
-        genome_set: set2
-        subsample: null
-
-  gambit:
-    params:
-      default:
-        k: 11
-        prefix: ATGAC
-
-  fastani:
-    # Only test with the full core count, FastANI is REALLY slow relative to the others
-    ncores: [16]
-
-    params:
-      default:
-        k: 16  # Default
-        fraglen: 3000  # Default
-
-  mash:
-    params:
-      # Test with sketch size 10^[3, 4, 5] as in FastANI paper
-      # Use default value for k
-      s_1e3:
-        k: 21
-        sketch_size: 1000
-      s_1e4:
-        k: 21
-        sketch_size: 10000
-      s_1e5:
-        k: 21
-        sketch_size: 100000

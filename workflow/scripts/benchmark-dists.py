@@ -1,5 +1,5 @@
 """
-Benchmark performance of GAMBIT vs. FastANI vs. Mash.
+Benchmark performance of GAMBIT vs. FastANI vs. Mash in calculating genomic distance/similarity.
 
 Expected Snakemake variables:
 * input
@@ -8,7 +8,7 @@ Expected Snakemake variables:
   * refs_fasta_dir
   * refs_list_file
 * wildcards
-  * genomes_key: Use query/reference genomes defined by config['benchmarks']['genomes'][genomes_key]
+  * genomes_key: Use query/reference genomes defined by config['benchmarks']['dist_benchmarks']['genomes'][genomes_key]
 * config: Everything is under the "benchmarks" key.
 * output
   * table: CSV file containing main results.
@@ -17,14 +17,15 @@ Expected Snakemake variables:
 
 from pathlib import Path
 import sys
-from subprocess import CalledProcessError
 import json
+import shlex
 
 import numpy as np
 import pandas as pd
 import attrs
 
 import gambit_pub.benchmark as bm
+from gambit_pub.utils import truncate_str
 from gambit.util.io import read_lines, write_lines
 
 
@@ -38,12 +39,6 @@ def subsample(n, m, seed=0):
 	np.random.seed(seed)
 	return np.random.choice(n, m, replace=False)
 
-def truncate_str(s, n):
-	l = len(s)
-	if l <= n:
-		return s
-	return f'{s[:n]}... ({l - n} characters omitted)'
-
 def log(*args, leading=None, trailing=None, **kw):
 	"""Display a log message."""
 	if leading is not None:
@@ -52,15 +47,77 @@ def log(*args, leading=None, trailing=None, **kw):
 	if trailing is not None:
 		print('\n' * trailing, file=sys.stderr, end='')
 
-def log_command(cmd: bm.Command, **kw):
+def log_command(cmd, **kw):
 	"""Log command before executing it."""
-	s = truncate_str(str(cmd), 400)
+	s = shlex.join(cmd)
+	s = truncate_str(s, 400)
 	log(f'+ {s}', **kw)
+
+
+def gambit_signatures_command(list_file, output, params, ncores):
+	args = [
+		'gambit', 'signatures', 'create',
+		'-c', ncores,
+		'-k', params['k'],
+		'-p', params['prefix'],
+		'-l', list_file,
+		'-o', output,
+		'--no-progress',
+	]
+	return list(map(str, args))
+
+
+def gambit_dist_command(query_sigs, ref_sigs, output, ncores):
+	args = [
+		'gambit', 'dist',
+		'-c', ncores,
+		'--qs', query_sigs,
+		'--rs', ref_sigs,
+		'-o', output,
+		'--no-progress',
+	]
+	return list(map(str, args))
+
+
+def fastani_command(query_list, ref_list, output, params, ncores):
+	args = [
+		'fastANI',
+		'-k', params['k'],
+		'--fragLen', params['fraglen'],
+		'--threads', ncores,
+		'--ql', query_list,
+		'--rl', ref_list,
+		'-o', output,
+	]
+	return list(map(str, args))
+
+
+def mash_sketch_command(files, output, params):
+	# Mash sketching does not support parallelization
+	args = [
+		'mash', 'sketch',
+		'-k', params['k'],
+		'-s', params['sketch_size'],
+		'-o', output,
+		*files
+	]
+	return list(map(str, args))
+
+
+def mash_dist_command(query_sketch, ref_sketch, params, ncores):
+	# Output is recorded in stdout
+	args = [
+		'mash', 'dist',
+		'-p', ncores,
+		query_sketch,
+		ref_sketch,
+	]
+	return list(map(str, args))
 
 
 ### Load config ###
 
-conf = snakemake.config['benchmarks']
+conf = snakemake.config['dist_benchmarks']
 default_ncores = conf['ncores']
 replicates = conf['replicates']
 shuffle = conf['shuffle']
@@ -112,12 +169,12 @@ for key, params in gambit_conf['params'].items():
 	dry_run or in_dir.mkdir()
 
 	qs = query_sigs[key] = (in_dir / 'queries.h5')
-	query_cmd = bm.gambit_signatures_command(query_list_file, qs, params, snakemake.threads)
+	query_cmd = gambit_signatures_command(query_list_file, qs, params, snakemake.threads)
 	log_command(query_cmd)
 	dry_run or bm.run(query_cmd)
 
 	rs = ref_sigs[key] = (in_dir / 'refs.h5')
-	ref_cmd = bm.gambit_signatures_command(ref_list_file, rs, params, snakemake.threads)
+	ref_cmd = gambit_signatures_command(ref_list_file, rs, params, snakemake.threads)
 	log_command(ref_cmd)
 	dry_run or bm.run(ref_cmd)
 
@@ -130,94 +187,67 @@ for key, params in mash_conf['params'].items():
 	dry_run or in_dir.mkdir()
 
 	qs = query_sketch[key] = (in_dir / 'queries.msh')
-	query_cmd = bm.mash_sketch_command(query_files, qs, params)
+	query_cmd = mash_sketch_command(query_files, qs, params)
 	log_command(query_cmd)
 	dry_run or bm.run(query_cmd)
 
 	rs = ref_sketch[key] = (in_dir / 'refs.msh')
-	ref_cmd = bm.mash_sketch_command(ref_files, rs, params)
+	ref_cmd = mash_sketch_command(ref_files, rs, params)
 	log_command(ref_cmd)
 	dry_run or bm.run(ref_cmd)
 
 
 ### Commands to be run  ###
 
-commands = dict()
+runner = bm.BenchmarkRunner(workdir='.')
 p = Path('..')
 
 # GAMBIT
 for params_key, params in gambit_conf['params'].items():
 	for ncores in gambit_conf.get('ncores', default_ncores):
-		commands['gambit', 'query_sigs', params_key, ncores] = \
-			bm.gambit_signatures_command(p / query_list_file, 'query_sigs.h5', params, ncores)
-		commands['gambit', 'ref_sigs', params_key, ncores] = \
-			bm.gambit_signatures_command(p / ref_list_file, 'ref_sigs.h5', params, ncores)
-		commands['gambit', 'dists', params_key, ncores] = \
-			bm.gambit_dist_command(p / query_sigs[params_key], p / ref_sigs[params_key], 'dists.csv', ncores)
+		runner.add_command(
+			('gambit', 'query_sigs', params_key, ncores),
+			gambit_signatures_command(p / query_list_file, 'query_sigs.h5', params, ncores),
+		)
+		runner.add_command(
+			('gambit', 'ref_sigs', params_key, ncores),
+			gambit_signatures_command(p / ref_list_file, 'ref_sigs.h5', params, ncores),
+		)
+		runner.add_command(
+			('gambit', 'dists', params_key, ncores),
+			gambit_dist_command(p / query_sigs[params_key], p / ref_sigs[params_key], 'dists.csv', ncores),
+		)
 
 # FastANI
 for params_key, params in fastani_conf['params'].items():
 	for ncores in fastani_conf.get('ncores', default_ncores):
-		commands['fastani', 'fastani', params_key, ncores] = \
-			bm.fastani_command(p / query_list_file, p / ref_list_file, 'out.tsv', params, ncores)
+		runner.add_command(
+			('fastani', 'fastani', params_key, ncores),
+			fastani_command(p / query_list_file, p / ref_list_file, 'out.tsv', params, ncores),
+		)
 
 # Mash
 for params_key, params in mash_conf['params'].items():
 	# Sketching doesn't support multiple cores
-	commands['mash', 'query_sketch', params_key, 1] = \
-		bm.mash_sketch_command([p / f for f in query_files], 'queries.msh', params)
-	commands['mash', 'ref_sketch', params_key, 1] = \
-		bm.mash_sketch_command([p / f for f in ref_files], 'refs.msh', params)
+	runner.add_command(
+		('mash', 'query_sketch', params_key, 1),
+		mash_sketch_command([p / f for f in query_files], 'queries.msh', params),
+	)
+	runner.add_command(
+		('mash', 'ref_sketch', params_key, 1),
+		mash_sketch_command([p / f for f in ref_files], 'refs.msh', params),
+	)
 
 	for ncores in mash_conf.get('ncores', default_ncores):
-		commands['mash', 'dists', params_key, ncores] = \
-			bm.mash_dist_command(p / query_sketch[params_key], p / ref_sketch[params_key], params, ncores)
+		runner.add_command(
+			('mash', 'dists', params_key, ncores),
+			mash_dist_command(p / query_sketch[params_key], p / ref_sketch[params_key], params, ncores),
+		)
 
 
 ### Run ####
 
-items = []
-
-for r in range(replicates):
-	log(f'*** Starting round {r + 1} of {replicates} ***', leading=2)
-
-	# Shuffle list of commands
-	commands_iter = np.asarray(list(commands.items()), dtype=object)
-	if shuffle:
-		np.random.seed(r)
-		np.random.shuffle(commands_iter)
-
-	for i, (key, command) in enumerate(commands_iter):
-		keystr = '-'.join(map(str, key))
-		log(f'Running {keystr} ({i + 1} of {len(commands)})', leading=1)
-		log_command(command)
-
-		if dry_run:
-			continue
-
-		workdir = Path(f'{keystr}-{r}')
-		workdir.mkdir()
-
-		# Try running
-		try:
-			result = bm.benchmark_command(
-				command, workdir, 'time',
-				stdout=workdir / 'stdout',
-				stderr=workdir / 'stderr',
-			)
-
-		except CalledProcessError as e:
-			# Print stdout and stderr and re-raise
-			with open(workdir / 'stdout') as f:
-				log(f.read())
-			with open(workdir / 'stderr') as f:
-				log(f.read())
-			raise
-
-		log(f'Completed in {result.time}')
-
-		items.append((r, *key, i, result))
-
+results = runner.run(replicates=replicates, dry_run=dry_run, shuffle=shuffle)
 
 ### Output results ###
 
@@ -225,10 +255,10 @@ if dry_run:
 	raise RuntimeError('Intentional rule failure - dry run')
 
 rows = [
-	(r + 1, *key, *attrs.astuple(result.time))
-	for r, *key, result in items
+	(result.round + 1, *result.key, result.execution_order, *attrs.astuple(result.time))
+	for result in results
 ]
-df = pd.DataFrame(rows, columns=['replicate', 'tool', 'command', 'paramset', 'ncores', 'run_order', 'real', 'user', 'sys'])
+df = pd.DataFrame(rows, columns=['replicate', 'tool', 'command', 'paramset', 'ncores', 'execution_order', 'real', 'user', 'sys'])
 df.sort_values(['replicate', 'tool', 'command', 'paramset', 'ncores'], inplace=True)
 df.to_csv(snakemake.output['table'], index=False)
 

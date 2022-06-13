@@ -30,6 +30,8 @@ if TEST:
 ### Configuration ###
 
 configfile: f'{SRC_DIR}/config/config.yaml'
+configfile: f'{SRC_DIR}/config/benchmarks.yaml'
+
 if TEST:
 	configfile: f'{SRC_DIR}/config/config-test.yaml'
 

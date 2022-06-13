@@ -21,3 +21,10 @@ def genome_set_label(gset):
     m = re.fullmatch(r'set(\d[a-z]?)', gset)
     assert m is not None
     return 'Set ' + m.group(1).upper()
+
+
+def truncate_str(s, n):
+    l = len(s)
+    if l <= n:
+        return s
+    return f'{s[:n]}... ({l - n} characters omitted)'
