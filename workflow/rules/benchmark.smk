@@ -3,6 +3,22 @@ Benchmark performance of GAMBIT and other tools.
 """
 
 
+# Benchmark gambit query command
+rule benchmark_query:
+	input:
+		db_genomes=rules.fetch_gambit_db.output['genomes'],
+		db_signatures=rules.fetch_gambit_db.output['signatures'],
+		query_file_dirs=[get_genomes_fasta_dir(gset) for gset in COMPARISON_GENOME_SETS],
+		query_list_files=[get_genomes_list_file(gset) for gset in COMPARISON_GENOME_SETS],
+	output: 'results/benchmarks/gambit-query/results.csv',
+	params:
+		genome_sets=COMPARISON_GENOME_SETS,
+	# This is just to prevent other jobs from running at the same time, doesn't influence the number
+	# of threads/cores used in benchmarks.
+	threads: workflow.cores
+	shadow: 'minimal'
+	script: '../scripts/benchmark-query.py'
+
 
 def get_dist_benchmark_input(wildcards):
 	genome_params = config['dist_benchmarks']['genomes'][wildcards.genomes_key]

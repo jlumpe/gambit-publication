@@ -5,6 +5,18 @@
 benchmark_dry_run: false
 
 
+# Settings for gambit query command benchmarks
+query_benchmark:
+  # Null uses defaults
+  ncores: [null]
+
+  # Number of times to run each command
+  replicates: 3
+
+  # Randomize order of all commands to be run each round?
+  shuffle: true
+
+
 # Settings for genomic distance (GAMBIT vs Mash vs FastANI) benchmarks
 dist_benchmarks:
   # Default number of cores to test
