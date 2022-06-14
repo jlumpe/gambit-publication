@@ -5,14 +5,25 @@ from functools import lru_cache as cache
 import pandas as pd
 import numpy as np
 from snakemake.utils import min_version
+from packaging.version import parse as parse_version
+from gambit import __version__ as _GAMBIT_VERSION
 from gambit.util.io import read_lines, write_lines
 
+
+# Check Snakemake version
 min_version("7.0")
+
+# Check GAMBIT version
+_min_gambit = '0.5'
+if parse_version(_GAMBIT_VERSION) < parse_version(_min_gambit):
+	raise RuntimeError(f'Requires GAMBIT version {_min_gambit}, installed version is {_GAMBIT_VERSION}')
+
 
 wildcard_constraints:
 	genomeset="set[12345]",
 	k="\d+",
 	prefix="[ACGT]+",
+
 
 # Path to this repo's base directory, regardless of the work directory we're running Snakemake in
 SRC_DIR = os.path.realpath(os.path.dirname(workflow.basedir))
