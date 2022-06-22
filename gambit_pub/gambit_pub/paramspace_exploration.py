@@ -117,7 +117,7 @@ def spearman_vs_k(paramdata, **kw):
 	)
 
 	fg.set_xlabels('$k$')
-	fg.set_ylabels('$\\rho$', rotation='horizontal')
+	fg.set_ylabels(r'$|\rho|$', rotation='horizontal', labelpad=20,)
 	fg.set(xticks=paramdata.k_vals)
 	fg.legend.set_title('Genome Set')
 

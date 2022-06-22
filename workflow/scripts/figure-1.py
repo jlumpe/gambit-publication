@@ -83,7 +83,7 @@ for gset, ax in fg.axes_dict.items():
 	rho = stats_df.loc[gset, 'spearman']
 	ax.text(
 		.05, .05,
-		f'$\\rho = {-rho:.3f}$',
+		f'$\\rho = {rho:.3f}$',
 		ha='left',
 		va='bottom',
 		transform=ax.transAxes,
