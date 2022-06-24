@@ -56,22 +56,38 @@ def get_gambit_paramspace(wildcards):
 
 	The "paramspace" wildcard must be one of several predefined options.
 	"""
-	from gambit_pub.paramspace_exploration import make_params_df
-
 	values = config['gambit_param_space']
 
 	if wildcards.paramspace == 'full':
-		args = (values['k'], values['prefix_len'], values['base_prefix'])
+		k_vals = values['k']
+		prefix_lens = values['prefix_len']
+		base_prefixes = values['base_prefix']
 	elif wildcards.paramspace == 'prefix_length':
-		args = (values['k'], values['prefix_len'], values['base_prefix'][0])
+		k_vals = values['k']
+		prefix_lens = values['prefix_len']
+		base_prefixes = [values['base_prefix'][0]]
 	elif wildcards.paramspace == 'prefix_sequence':
-		args = (values['k'], len(PREFIX), values['base_prefix'])
+		k_vals = values['k']
+		prefix_lens = [len(PREFIX)]
+		base_prefixes = values['base_prefix']
 	elif wildcards.paramspace == 'default_only':
-		args = (K, len(PREFIX), PREFIX)
+		k_vals = [K]
+		prefix_lens = [len(PREFIX)]
+		base_prefixes = [values['base_prefix'][0]]
 	else:
 		raise ValueError(f'Invalid value for "paramspace" wildcard: {wildcards.paramspace}')
 
-	return make_params_df(*args, COMPARISON_GENOME_SETS)
+	index = pd.MultiIndex.from_product(
+		[COMPARISON_GENOME_SETS, k_vals, prefix_lens, range(len(base_prefixes))],
+		names=['genomeset', 'k', 'prefix_len', 'prefix_version'],
+	)
+	df = index.to_frame(False)
+
+	df['base_prefix'] = [base_prefixes[i] for i in df['prefix_version']]
+	df['prefix'] = [row.base_prefix[:row.prefix_len] for _, row in df.iterrows()]
+
+	return df
+
 
 def gambit_ani_correlation_input(wildcards):
 	"""Input for gambit_ani_correlation rule."""

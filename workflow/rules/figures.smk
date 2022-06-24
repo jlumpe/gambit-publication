@@ -22,45 +22,16 @@ rule figure_1:
 rule figure_2a:
 	input: expand(rules.gambit_ani_correlation.output, paramspace='prefix_length')
 	output: 'results/figure-2/figure-2a.png'
-	run:
-		import gambit_pub.paramspace_exploration as pex
-
-		paramdata = pex.get_param_data(input[0], config)
-
-		pex.set_style()
-		fg = pex.spearman_vs_k(
-			paramdata,
-			col='prefix_len',
-		)
-
-		for plen, ax in fg.axes_dict.items():
-			ax.set_title(paramdata.prefix_map[plen, 0])
-
-		pex.highlight_default_axis(fg.axes_dict[paramdata.dflt_plen], paramdata.dflt_k)
-
-		fg.figure.savefig(output[0])
+	params:
+		paramspace='prefix_length',
+	script: '../scripts/figure-2.py'
 
 rule figure_2b:
 	input: expand(rules.gambit_ani_correlation.output, paramspace='prefix_sequence')
 	output: 'results/figure-2/figure-2b.png'
-	run:
-		import gambit_pub.paramspace_exploration as pex
-
-		paramdata = pex.get_param_data(input[0], config)
-
-		pex.set_style()
-		fg = pex.spearman_vs_k(
-			paramdata,
-			col='prefix_version',
-			col_wrap=4,
-		)
-
-		for pver, ax in fg.axes_dict.items():
-			ax.set_title(paramdata.prefix_map[paramdata.dflt_plen, pver])
-
-		pex.highlight_default_axis(fg.axes_dict[paramdata.dflt_pver], paramdata.dflt_k)
-
-		fg.figure.savefig(output[0])
+	params:
+		paramspace='prefix_sequence',
+	script: '../scripts/figure-2.py'
 
 rule figure_2:
 	input:
