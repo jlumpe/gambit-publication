@@ -68,7 +68,7 @@ paramspace = snakemake.params['paramspace']
 if paramspace == 'full':
 	relplot_kws.update(row='prefix_len', col='prefix_version')
 	axis_key_to_prefix = prefix_map
-	default_axis_key = [dflt_plen, dflt_pver]
+	default_axis_key = (dflt_plen, dflt_pver)
 
 elif paramspace == 'prefix_length':
 	relplot_kws['col'] = 'prefix_len'
