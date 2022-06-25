@@ -39,7 +39,7 @@ dist_benchmarks:
 
     # Set 4 genomes are obtained from actual clinical samples in a public health lab and so are
     # representative of typical GAMBIT query sequences. Set 2 is a diverse set of high-quality
-    # RefSeq assemblies and so approximates a (vey small) reference database.
+    # RefSeq assemblies and so approximates a (very small) reference database.
     set4_vs_set2:
       queries:
         genome_set: set4
