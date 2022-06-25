@@ -93,9 +93,16 @@ rule main:
 
 
 # Create supplemental figures and tables.
+# Note - generating data required by supplemental figure 1 is VERY slow
 rule supplemental:
 	input:
 		*rules.supplemental_figure_1.output
+
+
+rule all:
+	input:
+		*rules.main.input,
+		*rules.supplemental.input,
 
 
 # Starts IPython shell with access to global scope of workflow. For testing/development.
