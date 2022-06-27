@@ -11,6 +11,7 @@ Expected Snakemake variables:
 
 from pathlib import Path
 import json
+from string import ascii_uppercase
 
 import numpy as np
 import pandas as pd
@@ -41,8 +42,8 @@ SUBPLOT_WIDTH = 8
 SUBPLOT_HEIGHT = 2
 
 COVERAGE_LINE_STYLE = dict(lw=1, linestyle='dashed', color='black')
-MAJOR_GRID_STYLE = dict(color='#888888')
-MINOR_GRID_STYLE = dict(color='#cccccc')
+MAJOR_GRID_STYLE = dict(color='#aaaaaa')
+MINOR_GRID_STYLE = dict(color='#dddddd')
 
 
 ### Load data ###
@@ -50,6 +51,7 @@ MINOR_GRID_STYLE = dict(color='#cccccc')
 ngenomes = len(snakemake.input)
 genomes = snakemake.params['genomes']
 assert len(genomes) == ngenomes
+genome_labels = list(ascii_uppercase[:ngenomes])
 
 min_phred_col = str(snakemake.params['min_phred'])
 
@@ -67,10 +69,11 @@ for in_dir in map(Path, snakemake.input):
 
 	coverages.append(stats['estimated_coverage'])
 
-data = pd.concat(data_parts, keys=genomes, names=['genome']).reset_index()
-data['group'] = np.where(data['in_fasta'], 'In assembly', 'Not in assembly')
+data = pd.concat(data_parts, keys=genome_labels, names=['genome_label']).reset_index()
+data['K-mer in assembly'] = np.where(data['in_fasta'], 'Yes', 'No')
+# import IPython; IPython.embed()
 
-coverages = dict(zip(genomes, coverages))
+coverages = dict(zip(genome_labels, coverages))
 
 
 ### Histogram bins ###
@@ -89,10 +92,10 @@ bins = np.concatenate([bins_lin, 10 ** bins_log]) - .5
 fg = sns.displot(
 	data=data,
 	x='count',
-	row='genome',
-	hue='group',
+	row='genome_label',
+	hue='K-mer in assembly',
 	bins=bins,
-	col_order=genomes,
+	row_order=genome_labels,
 	common_norm=False,
 	height=SUBPLOT_HEIGHT,
 	aspect=SUBPLOT_WIDTH / SUBPLOT_HEIGHT,
@@ -118,11 +121,10 @@ for genome, ax in fg.axes_dict.items():
 # Symlog scale to discrete bins in the 1-10 range
 bottom = fg.axes[-1, 0]
 bottom.set_xscale('symlog', linthresh=10.5)
-bottom.autoscale()
 
 # Manually adjust X ticks for the weird scale
 xmax = bottom.get_xlim()[1]
-maj_ticks_log = np.arange(int(np.log10(xmax)) + 1)
+maj_ticks_log = np.arange(int(np.ceil(np.log10(xmax))))
 maj_ticklabels = ['$1$'] + [f'$10^{n}$' for n in maj_ticks_log[1:]]
 min_ticks = [x * 10**n for n in maj_ticks_log for x in range(1, 10)]
 
@@ -142,8 +144,8 @@ for ax in fg.axes.flat:
 		ax.tick_params('x', which='both', bottom=False)
 
 
-fg.legend.set_title(None)
 
+bottom.set_xlim([-0.5, max_count * 1.2])
 fg.tight_layout()
 
 
