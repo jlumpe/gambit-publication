@@ -14,6 +14,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 from gambit_pub.utils import genome_set_label
+import gambit_pub.plot as gpp
 
 
 ### Plot style ###
@@ -104,16 +105,11 @@ fg = sns.relplot(
 	**relplot_kws,
 )
 
-fg.set_xlabels('$k$')
-fg.set_ylabels(r'$|\rho|$', rotation='horizontal', labelpad=20,)
+gpp.set_fg_xlabel(fg, '$k$')
+gpp.set_fg_ylabel(fg, r'$|\rho|$', rotation='horizontal', ha='right')#, labelpad=20,)
+gpp.remove_fg_inner_ticks(fg)
 fg.set(xticks=k_vals)
 fg.legend.set_title('Genome Set')
-
-# Remove ticks for inner subplots
-for ax in set(fg._not_bottom_axes):
-	ax.tick_params(bottom=False)
-for ax in set(fg._not_left_axes):
-	ax.tick_params(left=False)
 
 # Set axis titles to prefix sequences
 for key, ax in fg.axes_dict.items():

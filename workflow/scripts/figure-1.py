@@ -21,6 +21,7 @@ from matplotlib.ticker import PercentFormatter
 
 from gambit.util.misc import zip_strict
 from gambit_pub.utils import genome_set_label
+import gambit_pub.plot as gpp
 
 
 # ## Setup
@@ -94,7 +95,9 @@ for gset, ax in fg.axes_dict.items():
 	ax.set_ylim(*YRANGE)
 	ax.xaxis.set_major_formatter(PercentFormatter(decimals=0))
 
-fg.set_axis_labels('ANI', 'GAMBIT Distance')
+gpp.remove_fg_inner_ticks(fg)
+gpp.set_fg_xlabel(fg, 'ANI')
+gpp.set_fg_ylabel(fg, 'GAMBIT Distance')
 fg.tight_layout()
 
 

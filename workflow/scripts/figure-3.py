@@ -18,7 +18,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-from gambit.util.misc import zip_strict
+import gambit_pub.plot as gpp
 
 
 ### Plot style ###
@@ -108,7 +108,8 @@ fg = sns.displot(
 )
 
 fg.set_titles(row_template='{row_name}')
-fg.set_xlabels('K-mer copy number')
+gpp.set_fg_xlabel(fg, 'Copy Number')
+gpp.set_fg_ylabel(fg, 'Number of k-mers')
 
 # Estimated coverage
 for genome, ax in fg.axes_dict.items():
@@ -142,7 +143,6 @@ for ax in fg.axes.flat:
 	# Remove ticks on all but bottom subplot
 	if ax is not bottom:
 		ax.tick_params('x', which='both', bottom=False)
-
 
 
 bottom.set_xlim([-0.5, max_count * 1.2])

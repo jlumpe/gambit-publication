@@ -175,6 +175,8 @@ for i, ax in enumerate(axes[1:]):
 
 
 # Finish up
+for ax in axes[:-1]:
+	ax.tick_params(bottom=False)
 axes[-1].set_xlabel('GAMBIT Distance')
 plt.tight_layout()
 fig.legend(

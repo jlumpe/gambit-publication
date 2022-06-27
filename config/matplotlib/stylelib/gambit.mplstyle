@@ -4,6 +4,7 @@
 axes.labelsize: 14
 axes.labelpad: 10
 axes.titlesize: 16
+figure.titlesize: 16
 
 axes.grid: True
 
