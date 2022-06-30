@@ -107,6 +107,7 @@ It does not include rules which generate intermediate data.
 | Rule                     | Output                            | Description                                       |
 |--------------------------|-----------------------------------|---------------------------------------------------|
 | `supplemental_figure_1`  | `results/supplemental-figure-1/`  | Generate supplemental figure 1. Note - VERY slow. |
+| `supplemental_figure_2`  | `results/supplemental-figure-2/`  | Generate supplemental figure 2.                   |
 
 ### Benchmarks
 
