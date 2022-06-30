@@ -109,7 +109,7 @@ fg = sns.displot(
 
 fg.set_titles(row_template='{row_name}')
 gpp.set_fg_xlabel(fg, 'Copy Number')
-gpp.set_fg_ylabel(fg, 'Number of k-mers')
+gpp.set_fg_ylabel(fg, 'Number of unique k-mers')
 
 # Estimated coverage
 for genome, ax in fg.axes_dict.items():
