@@ -108,6 +108,12 @@ It does not include rules which generate intermediate data.
 |--------------------------|-----------------------------------|---------------------------------------------------|
 | `supplemental_figure_1`  | `results/supplemental-figure-1/`  | Generate supplemental figure 1. Note - VERY slow. |
 
+### Benchmarks
+
+| Rule              | Output                             | Description                                         |
+|-------------------|------------------------------------|-----------------------------------------------------|
+| `benchmark_query` | `results/benchmarks/gambit-query/` | Benchmark GAMBIT taxonomic classification from CLI. |
+
 ### Source data
 
 | Rule                 | Output                              | Description                                                                     |
