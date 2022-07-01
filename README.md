@@ -93,21 +93,21 @@ It does not include rules which generate intermediate data.
 
 ### Main results
 
-| Rule       | Output              | Description         |
-|------------|---------------------|---------------------|
-| `figure_1` | `results/figure-1/` | Generate figure 1.  |
-| `figure_2` | `results/figure-2/` | Generate figure 2.  |
-| `figure_3` | `results/figure-3/` | Generate figure 3.  |
-| `figure_4` | `results/figure-4/` | Generate figure 4.  |
-| `figure_5` | `results/figure-5/` | Generate figure 5.  |
-| `figure_6` | `results/figure-6/` | Generate figure 6.  |
+| Rule       | Output                               | Description         |
+|------------|--------------------------------------|---------------------|
+| `figure_1` | `results/figures/figure-1.{png,csv}` | Generate figure 1.  |
+| `figure_2` | `results/figures/figure-2{a,b}.png`  | Generate figure 2.  |
+| `figure_3` | `results/figures/figure-3.png`       | Generate figure 3.  |
+| `figure_4` | `results/figures/figure-4{a,b}.png`  | Generate figure 4.  |
+| `figure_5` | `results/figures/figure-5{a,b}.png`  | Generate figure 5.  |
+| `figure_6` | `results/figures/figure-6.png`       | Generate figure 6.  |
 
 ### Supplemental results
 
-| Rule                     | Output                            | Description                                       |
-|--------------------------|-----------------------------------|---------------------------------------------------|
-| `supplemental_figure_1`  | `results/supplemental-figure-1/`  | Generate supplemental figure 1. Note - VERY slow. |
-| `supplemental_figure_2`  | `results/supplemental-figure-2/`  | Generate supplemental figure 2.                   |
+| Rule                     | Output                                      | Description                                       |
+|--------------------------|---------------------------------------------|---------------------------------------------------|
+| `supplemental_figure_1`  | `results/figures/supplemental-figure-1.png` | Generate supplemental figure 1. Note - VERY slow. |
+| `supplemental_figure_2`  | `results/fibures/supplemental-figure-2.png` | Generate supplemental figure 2.                   |
 
 ### Benchmarks
 

@@ -12,8 +12,8 @@ rule figure_1:
 		pairs=expand(rules.gambit_vs_ani.output['pairs'], genomeset=COMPARISON_GENOME_SETS, k=K, prefix=PREFIX),
 		stats=expand(rules.gambit_vs_ani.output['stats'], genomeset=COMPARISON_GENOME_SETS, k=K, prefix=PREFIX),
 	output:
-		figure='results/figure-1/figure-1.png',
-		stats='results/figure-1/stats.csv',
+		figure='results/figures/figure-1.png',
+		stats='results/figures/figure-1.csv',
 	script: '../scripts/figure-1.py'
 
 
@@ -21,14 +21,14 @@ rule figure_1:
 
 rule figure_2a:
 	input: expand(rules.gambit_ani_correlation.output, paramspace='prefix_length')
-	output: 'results/figure-2/figure-2a.png'
+	output: 'results/figures/figure-2a.png'
 	params:
 		paramspace='prefix_length',
 	script: '../scripts/figure-2.py'
 
 rule figure_2b:
 	input: expand(rules.gambit_ani_correlation.output, paramspace='prefix_sequence')
-	output: 'results/figure-2/figure-2b.png'
+	output: 'results/figures/figure-2b.png'
 	params:
 		paramspace='prefix_sequence',
 	script: '../scripts/figure-2.py'
@@ -37,7 +37,7 @@ rule figure_2:
 	input:
 		rules.figure_2a.output,
 		rules.figure_2b.output,
-	output: touch('results/figure-2/.completed')
+	output: touch('results/figures/.figure-2-completed')
 
 
 ### Figure 3 ###
@@ -73,7 +73,7 @@ def get_figure_3_input(wildcards=None):
 
 rule figure_3:
 	input: get_figure_3_input
-	output: 'results/figure-3/figure-3.png'
+	output: 'results/figures/figure-3.png'
 	params:
 		genomes=get_figure_3_genomes,
 		min_phred=20,
@@ -88,7 +88,7 @@ rule figure_4_subplot:
 	input:
 		db_signatures=rules.fetch_gambit_db.output['signatures'],
 		db_genomes=rules.fetch_gambit_db.output['genomes'],
-	output: 'results/figure-4/figure-4{subplot}.png'
+	output: 'results/figures/figure-4{subplot}.png'
 	wildcard_constraints:
 		subplot='[a-z]'
 	threads: workflow.cores
@@ -99,7 +99,7 @@ rule figure_4_subplot:
 # Generate all subplots of figure 4
 rule figure_4:
 	input: expand(rules.figure_4_subplot.output, subplot=list(config['figure_4']['subplots']))
-	output: touch('results/figure-4/.completed')
+	output: touch('results/figures/.figure-4-completed')
 
 
 ### Figure 5 ###
@@ -110,7 +110,7 @@ rule figure_5_subplot:
 	input:
 		db_signatures=rules.fetch_gambit_db.output['signatures'],
 		db_genomes=rules.fetch_gambit_db.output['genomes'],
-	output: 'results/figure-5/figure-5{subplot}.png'
+	output: 'results/figures/figure-5{subplot}.png'
 	wildcard_constraints:
 		subplot='[a-z]'
 	threads: workflow.cores
@@ -121,7 +121,7 @@ rule figure_5_subplot:
 # Generate all subplots of figure 5
 rule figure_5:
 	input: expand(rules.figure_5_subplot.output, subplot=list(config['figure_5']['subplots']))
-	output: touch('results/figure-5/.completed')
+	output: touch('results/figures/.figure-5-completed')
 
 
 ### Figure 6 ###
@@ -131,6 +131,6 @@ rule figure_6:
 		genomes_csv=get_genomes_table_file('set5'),
 		pw_dists=expand(rules.gambit_pw_dists.output[0], genomeset='set5', k=K, prefix=PREFIX)[0],
 	output:
-		"results/figure-6/figure-6.png"
+		"results/figures/figure-6.png"
 	script:
 		"../scripts/figure-6.py"
