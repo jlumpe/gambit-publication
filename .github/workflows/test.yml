@@ -20,6 +20,10 @@ on:
         description: "Invalidate cached source data"
         required: true
         type: boolean
+      snakemakeRules:
+        description: "Snakemake rules to test"
+        required: true
+        default: "main"
 
 
 jobs:
@@ -116,4 +120,4 @@ jobs:
 
       - name: Run workflow
         run: |
-          snakemake --cores all ${{ env.SNAKEMAKE_OPTS }}
+          snakemake --cores all ${{ github.event.inputs.snakemakeRules }} ${{ env.SNAKEMAKE_OPTS }}
