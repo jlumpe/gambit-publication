@@ -24,7 +24,7 @@ of options.
 * `workflow/`: Snakemake workflow files and related scripts.
 * `config/`: Workflow configuration files.
 * `resources/`: Input data.
-  * `genomes/`: Sets of bacterial genomes used for analysis.
+  * `genomes/`: Sets of bacterial genome assemblies used for analysis.
   * `gambit-db/`: GAMBIT database files.
 * `intermediate-data/`: Output of intermediate workflow targets.
 * `results/`: Processed result data.
@@ -84,12 +84,12 @@ It does not include rules which generate intermediate data.
 
 ### Aggregate rules
 
-| Rule             | Description                                                                    |
-|------------------|--------------------------------------------------------------------------------|
-| `all`            | `main` and `supplemental`.                                                     |
-| `main`           | Generate all primary figures.                                                  |
-| `supplemental`   | Generate all supplemental figures. Note - suppplemental figure 1 is VERY slow. |
-| `fetch_src_data` | Download all source data.                                                      |
+| Rule             | Description                                                                   |
+|------------------|-------------------------------------------------------------------------------|
+| `all`            | `main` and `supplemental`.                                                    |
+| `main`           | Generate all primary figures (default).                                       |
+| `supplemental`   | Generate all supplemental figures. Note - supplemental figure 1 is VERY slow. |
+| `fetch_src_data` | Download all source data. Not necessary to invoke manually.                   |
 
 ### Main results
 
