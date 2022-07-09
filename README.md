@@ -104,10 +104,12 @@ It does not include rules which generate intermediate data.
 
 ### Supplemental results
 
-| Rule    | Output                                      | Description                                       |
-|---------|---------------------------------------------|---------------------------------------------------|
-| `sfig1` | `results/figures/supplemental-figure-1.png` | Generate supplemental figure 1. Note - VERY slow. |
-| `sfig2` | `results/figures/supplemental-figure-2.png` | Generate supplemental figure 2.                   |
+| Rule      | Output                                      | Description                                       |
+|-----------|---------------------------------------------|---------------------------------------------------|
+| `sfig1`   | `results/figures/supplemental-figure-1.png` | Generate supplemental figure 1. Note - VERY slow. |
+| `sfig2`   | `results/figures/supplemental-figure-2.png` | Generate supplemental figure 2.                   |
+| `stable3` | `results/tables/supplemental-table-3.png`   | Generate supplemental table 3.                    |
+| `stable4` | `results/tables/supplemental-table-4.png`   | Generate supplemental table 4.                    |
 
 ### Benchmarks
 

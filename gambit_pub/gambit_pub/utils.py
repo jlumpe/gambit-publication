@@ -28,3 +28,12 @@ def truncate_str(s, n):
     if l <= n:
         return s
     return f'{s[:n]}... ({l - n} characters omitted)'
+
+
+def getattr_coalesce(x, *attrnames: str):
+    """Get attribute value from object ``x``, returning None if ``x`` is None."""
+    for name in attrnames:
+        if x is None:
+            return None
+        x = getattr(x, name)
+    return x

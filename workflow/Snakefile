@@ -98,6 +98,8 @@ rule supplemental:
 	input:
 		*rules.sfig1.output,
 		*rules.sfig2.output,
+		*rules.stable3.output,
+		*rules.stable4.output,
 
 
 rule all:
