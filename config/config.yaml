@@ -68,7 +68,7 @@ gambit_param_space:
     - ACTCTTG
 
 
-figure_3:
+fig3:
   # Genomes to plot
   genomes:
     # Chosen to be around the median precision/recall of all genomes
@@ -79,7 +79,7 @@ figure_3:
     - "17AC0006312"
 
 
-figure_4:
+fig4:
   subplots:
     a:
       # Klebsiella pneumoniae vs K. variicola
@@ -91,7 +91,7 @@ figure_4:
       out_taxa: [870]
 
 
-figure_5:
+fig5:
   subplots:
     # Shigella boydii vs S. dysenteriae
     a:

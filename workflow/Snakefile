@@ -83,12 +83,12 @@ if TEST:
 # Create primary figures and tables.
 rule main:
 	input:
-		*rules.figure_1.output,
-		*rules.figure_2.output,
-		*rules.figure_3.output,
-		*rules.figure_4.output,
-		*rules.figure_5.output,
-		*rules.figure_6.output,
+		*rules.fig1.output,
+		*rules.fig2.output,
+		*rules.fig3.output,
+		*rules.fig4.output,
+		*rules.fig5.output,
+		*rules.fig6.output,
 	default_target: True
 
 
@@ -96,8 +96,8 @@ rule main:
 # Note - generating data required by supplemental figure 1 is VERY slow
 rule supplemental:
 	input:
-		*rules.supplemental_figure_1.output,
-		*rules.supplemental_figure_2.output,
+		*rules.sfig1.output,
+		*rules.sfig2.output,
 
 
 rule all:

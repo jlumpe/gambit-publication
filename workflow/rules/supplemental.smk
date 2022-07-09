@@ -3,7 +3,7 @@ Generate supplemental figures and data.
 """
 
 
-rule supplemental_figure_1:
+rule sfig1:
 	input: expand(rules.gambit_ani_correlation.output, paramspace='full')
 	output: 'results/figures/supplemental-figure-1.png'
 	params:
@@ -11,7 +11,7 @@ rule supplemental_figure_1:
 	script: '../scripts/figure-2.py'
 
 
-rule supplemental_figure_2:
+rule sfig2:
 	input: expand(rules.gambit_vs_ani.output['pairs'], k=K, prefix=PREFIX, genomeset=COMPARISON_GENOME_SETS)
 	output:
 		figure='results/figures/supplemental-figure-2.png',

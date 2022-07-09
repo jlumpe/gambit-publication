@@ -167,4 +167,4 @@ rule fetch_src_data:
 		*rules.fetch_gambit_db.output,
 		*map(get_genomes_fasta_dir, ALL_GENOME_SETS),
 		# Only the needed set 3 FASTQ files
-		*expand(rules.fetch_genome_set_3_fastq.output, genome=config['figure_3']['genomes']),
+		*expand(rules.fetch_genome_set_3_fastq.output, genome=config['fig3']['genomes']),
