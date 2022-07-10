@@ -14,9 +14,10 @@ from gambit.util.io import read_lines, write_lines
 min_version("7.0")
 
 # Check GAMBIT version
-_min_gambit = '0.5'
-if parse_version(_GAMBIT_VERSION) < parse_version(_min_gambit):
-	raise RuntimeError(f'Requires GAMBIT version {_min_gambit}, installed version is {_GAMBIT_VERSION}')
+_min_gambit = parse_version('1.0')
+_max_gambit = parse_version('1.1')
+if not (_min_gambit <= parse_version(_GAMBIT_VERSION) < _max_gambit):
+	raise RuntimeError(f'Requires {_min_gambit} <= GAMBIT version < {_max_gambit}, installed version is {_GAMBIT_VERSION}')
 
 
 wildcard_constraints:
