@@ -3,8 +3,8 @@
 Expected Snakemake variables:
 
 * input
-    * genomes_csv: CSV file of genome attributes for genome set 5.
-    * pw_dists: CSV file of pairwise GAMBIT distances for genome set 5.
+	* genomes_csv: CSV file of genome attributes for genome set 5.
+	* pw_dists: CSV file of pairwise GAMBIT distances for genome set 5.
 * output: Figure PNG
 """
 
@@ -22,9 +22,9 @@ from scipy.cluster.hierarchy import linkage
 plt.style.use('gambit')
 
 plt.rcParams.update({
-    'image.cmap': 'Purples_r',
-    'axes.labelsize': 10,
-    'axes.grid': False,
+	'image.cmap': 'Purples_r',
+	'axes.labelsize': 10,
+	'axes.grid': False,
 })
 
 PHYLOGROUP_PALETTE = 'Set1'
@@ -34,87 +34,87 @@ FIG_HEIGHT = 4
 ### Code ###
 
 def linkage_to_df(link):
-    """Convert array returned by scipy...linkage() to DataFrame of node attributes."""
-    nleaves = link.shape[0] + 1
-    nnodes = 2 * nleaves - 1
+	"""Convert array returned by scipy...linkage() to DataFrame of node attributes."""
+	nleaves = link.shape[0] + 1
+	nnodes = 2 * nleaves - 1
 
-    # Fill with leaf values
-    df = pd.DataFrame.from_dict(dict(
-        left=np.full(nnodes, -1),
-        right=np.full(nnodes, -1),
-        height=np.full(nnodes, 0.),
-        size=np.full(nnodes, 1),
-    ))
+	# Fill with leaf values
+	df = pd.DataFrame.from_dict(dict(
+		left=np.full(nnodes, -1),
+		right=np.full(nnodes, -1),
+		height=np.full(nnodes, 0.),
+		size=np.full(nnodes, 1),
+	))
 
-    # Copy values for internal nodes from linkage array
-    for i in range(4):
-        df.iloc[:, i].values[nleaves:] = link[:, i]
+	# Copy values for internal nodes from linkage array
+	for i in range(4):
+		df.iloc[:, i].values[nleaves:] = link[:, i]
 
-    return df
+	return df
 
 def make_dendrogram(link_df, left=0.):
-    """Make a DataFrame with coordinates for dendrogram branches."""
-    nnodes = link_df.shape[0]
-    nleaves = (nnodes + 1) // 2
+	"""Make a DataFrame with coordinates for dendrogram branches."""
+	nnodes = link_df.shape[0]
+	nleaves = (nnodes + 1) // 2
 
-    nodes = link_df[['left', 'right', 'height', 'size']]
-    nodes['center'] = 0
-    _make_subtree(nodes, nodes.index[-1], 0)
+	nodes = link_df[['left', 'right', 'height', 'size']]
+	nodes['center'] = 0
+	_make_subtree(nodes, nodes.index[-1], 0)
 
-    leaf_order = np.empty(nleaves, dtype=int)
-    for i in range(nleaves):
-        c = nodes.loc[i, 'center']
-        assert float(c).is_integer()
-        leaf_order[int(c)] = i
+	leaf_order = np.empty(nleaves, dtype=int)
+	for i in range(nleaves):
+		c = nodes.loc[i, 'center']
+		assert float(c).is_integer()
+		leaf_order[int(c)] = i
 
-    nodes['center'] += left
+	nodes['center'] += left
 
-    return dict(
-        nodes=nodes,
-        leaf_order=leaf_order,
-    )
+	return dict(
+		nodes=nodes,
+		leaf_order=leaf_order,
+	)
 
 def _make_subtree(nodes, i, ll):
-    """Recursively fill in info for nodes, bottom to top. Return (center, right_leaf)."""
+	"""Recursively fill in info for nodes, bottom to top. Return (center, right_leaf)."""
 
-    if nodes.loc[i, 'size'] <= 1:
-        nodes.loc[i, 'center'] = ll
-        return (ll, ll)
+	if nodes.loc[i, 'size'] <= 1:
+		nodes.loc[i, 'center'] = ll
+		return (ll, ll)
 
-    else:
-        lc, lr = _make_subtree(nodes, nodes.loc[i, 'left'], ll)
-        rc, rr = _make_subtree(nodes, nodes.loc[i, 'right'], lr + 1)
+	else:
+		lc, lr = _make_subtree(nodes, nodes.loc[i, 'left'], ll)
+		rc, rr = _make_subtree(nodes, nodes.loc[i, 'right'], lr + 1)
 
-        center = nodes.loc[i, 'center'] = (ll + rr) / 2
+		center = nodes.loc[i, 'center'] = (ll + rr) / 2
 
-        return center, rr
+		return center, rr
 
 def draw_dendrogram(ax, dg, horizontal=False, colorfunc=None):
-    """Draw a dendrogram onto a matplotlib axes object."""
-    nodes = dg['nodes']
-    nnodes = nodes.shape[0]
-    nleaves = (nnodes + 1) // 2
-    internal = range(nleaves, nnodes)
+	"""Draw a dendrogram onto a matplotlib axes object."""
+	nodes = dg['nodes']
+	nnodes = nodes.shape[0]
+	nleaves = (nnodes + 1) // 2
+	internal = range(nleaves, nnodes)
 
-    segments = [_node_segment(nodes, i, horizontal) for i in internal]
-    colors = [colorfunc(i) for i in internal]
+	segments = [_node_segment(nodes, i, horizontal) for i in internal]
+	colors = [colorfunc(i) for i in internal]
 
-    lc = LineCollection(segments, colors=colors)
-    ax.add_collection(lc)
-    ax.autoscale()
+	lc = LineCollection(segments, colors=colors)
+	ax.add_collection(lc)
+	ax.autoscale()
 
-    if horizontal:
-        ax.yaxis.set_visible(False)
-    else:
-        ax.xaxis.set_visible(False)
+	if horizontal:
+		ax.yaxis.set_visible(False)
+	else:
+		ax.xaxis.set_visible(False)
 
 def _node_segment(nodes, i, horizontal):
-    li, ri, h = nodes.loc[i, ['left', 'right', 'height']]
-    lh, lc = nodes.loc[li, ['height', 'center']]
-    rh, rc = nodes.loc[ri, ['height', 'center']]
+	li, ri, h = nodes.loc[i, ['left', 'right', 'height']]
+	lh, lc = nodes.loc[li, ['height', 'center']]
+	rh, rc = nodes.loc[ri, ['height', 'center']]
 
-    segment = [(lc, lh), (lc, h), (rc, h), (rc, rh)]
-    return [p[::-1] for p in segment] if horizontal else segment
+	segment = [(lc, lh), (lc, h), (rc, h), (rc, rh)]
+	return [p[::-1] for p in segment] if horizontal else segment
 
 
 ### Load input data ###
@@ -137,10 +137,10 @@ nnodes = nodes.shape[0]
 # Assign phylogroups
 nodes.loc[:ngenomes, 'phylogroup'] = genomes_df['phylogroup']
 for i in range(ngenomes, nnodes):
-    left_pg = nodes.loc[nodes.loc[i, 'left'], 'phylogroup']
-    right_pg = nodes.loc[nodes.loc[i, 'right'], 'phylogroup']
-    if pd.notnull(left_pg) and left_pg == right_pg:
-        nodes.loc[i, 'phylogroup'] = left_pg
+	left_pg = nodes.loc[nodes.loc[i, 'left'], 'phylogroup']
+	right_pg = nodes.loc[nodes.loc[i, 'right'], 'phylogroup']
+	if pd.notnull(left_pg) and left_pg == right_pg:
+		nodes.loc[i, 'phylogroup'] = left_pg
 
 
 ### Calculated plot parameters ###
@@ -159,8 +159,8 @@ ax_width = [.5 * FIG_HEIGHT, .25, FIG_HEIGHT, .2]
 # Left side of axes in physical coordinates (inches)
 ax_left = []
 for i in range(4):
-    left = 0 if i == 0 else ax_left[i-1] + ax_width[i-1] + ax_pad[i-1]
-    ax_left.append(left)
+	left = 0 if i == 0 else ax_left[i-1] + ax_width[i-1] + ax_pad[i-1]
+	ax_left.append(left)
 
 fig_w = sum(ax_pad) + sum(ax_width)
 
@@ -181,10 +181,10 @@ cbar_ax = fig.add_axes(ax_rects[3])
 
 dg = make_dendrogram(nodes, left=.5)
 draw_dendrogram(
-    dg_ax,
-    dg,
-    horizontal=True,
-    colorfunc=lambda i: phylo_colors.get(nodes.loc[i, 'phylogroup'], 'black'),
+	dg_ax,
+	dg,
+	horizontal=True,
+	colorfunc=lambda i: phylo_colors.get(nodes.loc[i, 'phylogroup'], 'black'),
 )
 
 dg_ax.invert_xaxis()
@@ -193,7 +193,7 @@ dg_ax.set_xlim(None, 0)
 dg_ax.set_xlabel('GAMBIT Distance')
 
 for side in ['left', 'top', 'right']:
-    dg_ax.spines[side].set_visible(False)
+	dg_ax.spines[side].set_visible(False)
 
 
 ### Heatmap ###
@@ -207,12 +207,12 @@ hm_ax.set_aspect(1, share=False, adjustable='box', anchor='W')
 ### Table ###
 
 for spine in tbl_ax.spines.values():
-    spine.set_visible(False)
+	spine.set_visible(False)
 
 for i, gi in enumerate(lo):
-    pg = genomes_df.loc[gi, 'phylogroup']
-    tbl_ax.text(0, i + .5, pg, ha='left', va='center', color=phylo_colors[pg])
-    tbl_ax.text(1, i + .5, genomes_df.loc[gi, 'mlst'], ha='left', va='center')
+	pg = genomes_df.loc[gi, 'phylogroup']
+	tbl_ax.text(0, i + .5, pg, ha='left', va='center', color=phylo_colors[pg])
+	tbl_ax.text(1, i + .5, genomes_df.loc[gi, 'mlst'], ha='left', va='center')
 
 tbl_ax.set_xticks([0, 1])
 tbl_ax.set_xticklabels(['Phylogroup', 'MLST'], rotation=-45, ha='left', va='top')
@@ -224,9 +224,9 @@ tbl_ax.set_xlim(.0, 1.0)
 ### Color bar ###
 
 plt.colorbar(
-    hm,
-    cax=cbar_ax,
-    label='GAMBIT Distance',
+	hm,
+	cax=cbar_ax,
+	label='GAMBIT Distance',
 )
 
 

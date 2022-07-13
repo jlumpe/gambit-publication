@@ -36,9 +36,9 @@ SUBPLOT_SIZE = (12, 3)
 labels = list(map(genome_set_label, genome_sets))
 
 df = pd.concat(
-    [pd.read_csv(file, index_col=[0, 1]) for file in snakemake.input],
-    keys=labels,
-    names=['gset'],
+	[pd.read_csv(file, index_col=[0, 1]) for file in snakemake.input],
+	keys=labels,
+	names=['gset'],
 )
 
 df['ANI Reported'] = np.where(df['ani'].isnull(), 'No', 'Yes')
@@ -48,22 +48,22 @@ df['gambit_similarity'] = 1 - df['gambit']
 ### Plot ###
 
 fg = sns.displot(
-    data=df[df['gambit_similarity'] > 0].reset_index(),
-    x='gambit_similarity',
-    row='gset',
-    hue='ANI Reported',
-    common_norm=False,
-    common_bins=True,
-    aspect=SUBPLOT_SIZE[0] / SUBPLOT_SIZE[1],
-    height=SUBPLOT_SIZE[1],
-    log_scale=True,
-    stat='percent',
-    element='step',
-    facet_kws=dict(
-        margin_titles=True,
-        despine=False,
-        sharey=False,
-    ),
+	data=df[df['gambit_similarity'] > 0].reset_index(),
+	x='gambit_similarity',
+	row='gset',
+	hue='ANI Reported',
+	common_norm=False,
+	common_bins=True,
+	aspect=SUBPLOT_SIZE[0] / SUBPLOT_SIZE[1],
+	height=SUBPLOT_SIZE[1],
+	log_scale=True,
+	stat='percent',
+	element='step',
+	facet_kws=dict(
+		margin_titles=True,
+		despine=False,
+		sharey=False,
+	),
 )
 
 fg.set_titles(row_template='{row_name}', size=plt.rcParams['axes.titlesize'])

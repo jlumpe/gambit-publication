@@ -56,12 +56,12 @@ nreads = 0
 total_len = 0
 
 for record in seqfile.parse():
-    nreads += 1
-    total_len += len(record.seq)
-    accumulate_kmers_fastq(kmerspec, record, accumulator)
+	nreads += 1
+	total_len += len(record.seq)
+	accumulate_kmers_fastq(kmerspec, record, accumulator)
 
-    if TRUNCATE_READS is not None and nreads >= TRUNCATE_READS:
-        break
+	if TRUNCATE_READS is not None and nreads >= TRUNCATE_READS:
+		break
 
 
 ### Counts table ###
@@ -71,9 +71,9 @@ indices, counts_binned = accumulator.to_arrays()
 counts_cum = np.cumsum(counts_binned[:, ::-1], axis=1)[:, ::-1]
 
 counts_df = pd.DataFrame(
-    counts_cum,
-    index=pd.Series(indices, name='index'),
-    columns=phred_bins,
+	counts_cum,
+	index=pd.Series(indices, name='index'),
+	columns=phred_bins,
 )
 
 counts_df.insert(0, 'in_fasta', np.in1d(indices, fasta_sig))
@@ -84,11 +84,11 @@ counts_df.insert(0, 'in_fasta', np.in1d(indices, fasta_sig))
 assembly_len = int(fasta_stats.loc['total_length'])
 
 stats = dict(
-    nreads=nreads,
-    total_length=total_len,
-    estimated_coverage=total_len / assembly_len,
-    assembly_length=assembly_len,
-    assembly_nkmers=len(fasta_sig),
+	nreads=nreads,
+	total_length=total_len,
+	estimated_coverage=total_len / assembly_len,
+	assembly_length=assembly_len,
+	assembly_nkmers=len(fasta_sig),
 )
 
 
@@ -100,4 +100,4 @@ outdir.mkdir(parents=True, exist_ok=True)
 counts_df.to_csv(outdir / 'kmer-counts.csv')
 
 with open(outdir / 'stats.json', 'w') as f:
-    json.dump(stats, f)
+	json.dump(stats, f)
