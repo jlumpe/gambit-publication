@@ -4,6 +4,8 @@ from pathlib import Path
 import os
 import re
 
+import pandas as pd
+
 
 def symlink_to_relative(dst, src, is_dir=False):
 	"""Create a symlink frm src to dst, where both paths are relative to the same directory.
@@ -37,3 +39,12 @@ def getattr_coalesce(x, *attrnames: str):
 			return None
 		x = getattr(x, name)
 	return x
+
+
+def fix_int_cols(df: pd.DataFrame, cols):
+	"""Fix DataFrame columns which were automatically converted to float due to null values."""
+	if isinstance(cols, str):
+		cols = [cols]
+
+	for col in cols:
+		df[col] = df[col].astype(pd.Int64Dtype())

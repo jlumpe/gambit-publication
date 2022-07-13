@@ -27,7 +27,7 @@ rule stable3:
 	run:
 		import pandas as pd
 		from gambit.db import load_genomeset
-		from gambit_pub.utils import getattr_coalesce
+		from gambit_pub.utils import getattr_coalesce, fix_int_cols
 
 		session, gset = load_genomeset(input[0])
 		rows = []
@@ -49,7 +49,8 @@ rule stable3:
 				))
 
 		df = pd.DataFrame(rows)
-		df.sort_values(['genus_ncbi_id', 'species_ncbi_idx', 'db_id'], inplace=True)
+		fix_int_cols(df, ['genus_db_id', 'genus_ncbi_id', 'species_db_id', 'species_ncbi_id'])
+		df.sort_values(['genus_ncbi_id', 'species_ncbi_id', 'db_id'], inplace=True)
 		df.to_csv(output[0], index=False)
 
 
@@ -60,6 +61,7 @@ rule stable4:
 	run:
 		import pandas as pd
 		from gambit.db import load_genomeset
+		from gambit_pub.utils import fix_int_cols
 
 		session, gset = load_genomeset(input[0])
 		rows = []
@@ -78,5 +80,6 @@ rule stable4:
 					))
 
 		df = pd.DataFrame(rows)
+		fix_int_cols(df, ['parent_id', 'ncbi_id'])
 		df.sort_values(['rank', 'name'], inplace=True)
 		df.to_csv(output[0], index=False)
