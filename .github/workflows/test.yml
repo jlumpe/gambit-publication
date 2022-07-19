@@ -94,7 +94,7 @@ jobs:
       - name: Install GAMBIT
         run: |
           conda activate gambit-pub
-          pip install git+https://github.com/hesslab-gambit/gambit.git@$GAMBIT_VERSION
+          pip install git+https://github.com/jlumpe/gambit.git@$GAMBIT_VERSION
         env:
           GAMBIT_VERSION: ${{ github.event.inputs.gambitVersion }}
 

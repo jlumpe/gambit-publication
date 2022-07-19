@@ -2,7 +2,7 @@
 
 A [Snakemake](https://snakemake.github.io/) workflow to (re)produce figures and data in the initial
 GAMBIT [publication](https://doi.org/10.1101/2022.06.14.496173). Source code for GAMBIT itself is
-located [here](https://github.com/hesslab-gambit/gambit/).
+located [here](https://github.com/jlumpe/gambit/).
 
 
 ## Instructions
