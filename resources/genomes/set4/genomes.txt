@@ -266,7 +266,6 @@
 21-00371362.fasta.gz
 21-00371363.fasta.gz
 21-00371740.fasta.gz
-21-00372063.fasta.gz
 21-00372500.fasta.gz
 21-00372680.fasta.gz
 21-00373409.fasta.gz
