@@ -42,8 +42,8 @@ jobs:
         resources/genomes/.download
         resources/genomes/set3-common/fastq
         resources/genomes/set5/fasta
-        resources/gambit-db/db-genomes.db
-        resources/gambit-db/db-signatures.h5
+        resources/gambit-db/db-genomes.gdb
+        resources/gambit-db/db-signatures.gs
 
     steps:
 

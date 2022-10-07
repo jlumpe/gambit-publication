@@ -40,8 +40,8 @@ fastani:
 # URLs for downloading source files
 src_data:
   gambit_db:
-    genomes: "hesslab-gambit-public/databases/refseq-curated/1.0-beta/gambit-genomes-1.0b1-210719.db"
-    signatures: "hesslab-gambit-public/databases/refseq-curated/1.0-beta/gambit-signatures-1.0b1-210719.h5"
+    genomes: "jlumpe-gambit/public/databases/refseq-curated/1.0-beta/gambit-genomes-1.0b1-210719.gdb"
+    signatures: "jlumpe-gambit/public/databases/refseq-curated/1.0-beta/gambit-signatures-1.0b1-210719.gs"
 
   genome_sets:
     # Sets 1 and 2 downloaded from NCBI, have URls in their genomes.csv files

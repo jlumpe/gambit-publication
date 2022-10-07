@@ -168,12 +168,12 @@ for key, params in gambit_conf['params'].items():
 	in_dir = Path(f'gambit-input-{key}')
 	dry_run or in_dir.mkdir()
 
-	qs = query_sigs[key] = (in_dir / 'queries.h5')
+	qs = query_sigs[key] = (in_dir / 'queries.gs')
 	query_cmd = gambit_signatures_command(query_list_file, qs, params, snakemake.threads)
 	log_command(query_cmd)
 	dry_run or bm.run(query_cmd)
 
-	rs = ref_sigs[key] = (in_dir / 'refs.h5')
+	rs = ref_sigs[key] = (in_dir / 'refs.gs')
 	ref_cmd = gambit_signatures_command(ref_list_file, rs, params, snakemake.threads)
 	log_command(ref_cmd)
 	dry_run or bm.run(ref_cmd)
@@ -207,11 +207,11 @@ for params_key, params in gambit_conf['params'].items():
 	for ncores in gambit_conf.get('ncores', default_ncores):
 		runner.add_command(
 			('gambit', 'query_sigs', params_key, ncores),
-			gambit_signatures_command(p / query_list_file, 'query_sigs.h5', params, ncores),
+			gambit_signatures_command(p / query_list_file, 'query_sigs.gs', params, ncores),
 		)
 		runner.add_command(
 			('gambit', 'ref_sigs', params_key, ncores),
-			gambit_signatures_command(p / ref_list_file, 'ref_sigs.h5', params, ncores),
+			gambit_signatures_command(p / ref_list_file, 'ref_sigs.gs', params, ncores),
 		)
 		runner.add_command(
 			('gambit', 'dists', params_key, ncores),

@@ -25,8 +25,8 @@ GCS_PREFIX = 'https://storage.googleapis.com/'
 # Download GAMBIT database files
 rule fetch_gambit_db:
 	output:
-		genomes=f'{DL_RESOURCES}/gambit-db/db-genomes.db',
-		signatures=f'{DL_RESOURCES}/gambit-db/db-signatures.h5',
+		genomes=f'{DL_RESOURCES}/gambit-db/db-genomes.gdb',
+		signatures=f'{DL_RESOURCES}/gambit-db/db-signatures.gs',
 	params:
 		genomes_url=GCS_PREFIX + config['src_data']['gambit_db']['genomes'],
 		signatures_url=GCS_PREFIX + config['src_data']['gambit_db']['signatures'],
