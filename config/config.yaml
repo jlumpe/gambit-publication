@@ -45,10 +45,10 @@ src_data:
 
   genome_sets:
     # Sets 1 and 2 downloaded from NCBI, have URls in their genomes.csv files
-    set3: "hesslab-gambit-public/genomes/set3/fasta/"
-    set4: "hesslab-gambit-public/genomes/set4/fasta/"
-    set5: "hesslab-gambit-public/genomes/set5/fasta.tar.gz"
-    set3_fastq: "hesslab-gambit-public/genomes/set3/fastq/"
+    set3: "jlumpe-gambit/public/publication/genomes/set3/fasta/"
+    set4: "jlumpe-gambit/public/publication/genomes/set4/fasta/"
+    set5: "jlumpe-gambit/public/publication/genomes/set5/fasta.tar.gz"
+    set3_fastq: "jlumpe-gambit/public/publication/genomes/set3/fastq/"
 
 
 # Values to use for parameter space exploration (figure 2 and supplemental figure 1)
