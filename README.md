@@ -60,7 +60,7 @@ from the project's root directory. This must be done with each new shell session
 The preferred way to install GAMBIT is through the Bioconda channel:
 
 ```
-conda install -c bioconda hesslab-gambit
+conda install -c bioconda gambit=1.0
 ```
 
 Make sure your Conda environment is activated first.
