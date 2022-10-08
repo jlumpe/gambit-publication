@@ -40,11 +40,11 @@ fastani:
 # URLs for downloading source files
 src_data:
   gambit_db:
-    genomes: "jlumpe-gambit/public/databases/refseq-curated/1.0-beta/gambit-genomes-1.0b1-210719.gdb"
-    signatures: "jlumpe-gambit/public/databases/refseq-curated/1.0-beta/gambit-signatures-1.0b1-210719.gs"
+    genomes: "jlumpe-gambit/public/databases/refseq-curated/1.0/gambit-refseq-curated-1.0.gdb"
+    signatures: "jlumpe-gambit/public/databases/refseq-curated/1.0/gambit-refseq-curated-1.0.gs"
 
   genome_sets:
-    # Sets 1 and 2 downloaded from NCBI, have URls in their genomes.csv files
+    # Sets 1 and 2 downloaded from NCBI, have URLs in their genomes.csv files
     set3: "jlumpe-gambit/public/publication/genomes/set3/fasta/"
     set4: "jlumpe-gambit/public/publication/genomes/set4/fasta/"
     set5: "jlumpe-gambit/public/publication/genomes/set5/fasta.tar.gz"
