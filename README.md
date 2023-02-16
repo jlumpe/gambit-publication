@@ -1,8 +1,14 @@
 # GAMBIT (Genomic Approximation Method for Bacterial Identification and Tracking): A methodology to rapidly leverage whole genome sequencing of bacterial isolates for clinical identification
 
 A [Snakemake](https://snakemake.github.io/) workflow to (re)produce figures and data in the initial
-GAMBIT [publication](https://doi.org/10.1101/2022.06.14.496173). Source code for GAMBIT itself is
-located [here](https://github.com/jlumpe/gambit/).
+GAMBIT publication:
+
+Lumpe J, Gumbleton L, Gorzalski A, Libuit K, Varghese V, et al. (2023) GAMBIT (Genomic Approximation
+Method for Bacterial Identification and Tracking): A methodology to rapidly leverage whole genome
+sequencing of bacterial isolates for clinical identification. PLOS ONE 18(2): e0277575.
+https://doi.org/10.1371/journal.pone.0277575
+
+Source code for GAMBIT itself is located [here](https://github.com/jlumpe/gambit/).
 
 
 ## Instructions
