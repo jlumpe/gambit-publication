@@ -10,6 +10,8 @@ https://doi.org/10.1371/journal.pone.0277575
 
 Source code for GAMBIT itself is located [here](https://github.com/jlumpe/gambit/).
 
+Please feel free to contact me at jared@jaredlumpe.com with any questions you have.
+
 
 ## Instructions
 
